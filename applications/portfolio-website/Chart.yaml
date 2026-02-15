@@ -1,0 +1,12 @@
+apiVersion: v2
+name: portfolio-website
+description: Personal portfolio website
+type: application
+version: 1.0.0
+appVersion: "1.0"
+keywords:
+  - portfolio
+  - website
+maintainers:
+  - name: Lukas Wöllhaf
+    email: infra@lukaswoellhaf.com
