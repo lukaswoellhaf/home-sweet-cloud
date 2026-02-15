@@ -16,7 +16,6 @@ jobs:
         run: |
           echo "Installing k3sup..."
           curl -sLS https://get.k3sup.dev | sh
-          sudo install k3sup /usr/local/bin/
           k3sup version
       
       - name: Configure SSH key
@@ -45,6 +44,11 @@ jobs:
             --context home-sweet-cloud
           
           echo "k3s installation complete"
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
       
       - name: Verify k3s cluster
         run: |
