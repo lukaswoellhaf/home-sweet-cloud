@@ -1,0 +1,99 @@
+name: Deploy Base Infrastructure
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy base infrastructure to k3s cluster
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Configure SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Add server to known_hosts
+        run: |
+          ssh-keyscan -H ${{ vars.SERVER_IP }} >> ~/.ssh/known_hosts
+      
+      - name: Configure kubectl
+        run: |
+          mkdir -p $HOME/.kube
+          
+          # Fetch kubeconfig from k3s server
+          echo "Fetching kubeconfig from server..."
+          scp root@${{ vars.SERVER_IP }}:/etc/rancher/k3s/k3s.yaml $HOME/.kube/config
+          
+          # Replace localhost with actual server IP
+          sed -i "s/127.0.0.1/${{ vars.SERVER_IP }}/g" $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+          
+          # Verify connection
+          kubectl cluster-info
+          kubectl get nodes
+      
+      - name: Install cert-manager
+        run: |
+          # Check if cert-manager is already installed
+          if kubectl get namespace cert-manager &>/dev/null; then
+            echo "cert-manager namespace already exists, skipping installation"
+          else
+            echo "Installing cert-manager..."
+            kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.19.3/cert-manager.yaml
+          fi
+      
+      - name: Wait for cert-manager to be ready
+        run: |
+          echo "Waiting for cert-manager pods to be ready..."
+          kubectl wait --for=condition=ready pod \
+            -l app.kubernetes.io/instance=cert-manager \
+            -n cert-manager \
+            --timeout=300s
+          
+          echo "cert-manager is ready"
+      
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'latest'
+      
+      - name: Deploy infrastructure Helm Charts
+        run: |
+          helm upgrade --install infrastructure ./infrastructure \
+            --create-namespace \
+            --wait \
+            --timeout 5m
+          
+          echo "Infrastructure Helm Charts deployed and verified successfully"
+      
+      - name: Extract and update service account credentials
+        env:
+          GH_TOKEN: ${{ secrets.PAT_SECRET_MANAGER }}
+        run: |
+          echo "Waiting for service account token to be created..."
+          sleep 5
+          
+          # Extract the token
+          echo "Extracting deployment token..."
+          TOKEN=$(kubectl get secret deployment-token -n default -o jsonpath='{.data.token}' | base64 -d)
+          
+          # Extract the CA certificate
+          echo "Extracting CA certificate..."
+          CA_CERT=$(kubectl get secret deployment-token -n default -o jsonpath='{.data.ca\.crt}')
+          
+          # Update GitHub secrets using GitHub CLI
+          echo "Updating GitHub secrets..."
+          echo "$TOKEN" | gh secret set DEPLOYMENT_SA_TOKEN --repo ${{ github.repository }}
+          echo "$CA_CERT" | gh secret set CLUSTER_CA_CERT --repo ${{ github.repository }}
+          
+          echo "Service account credentials set in GitHub secrets"
+      
+      - name: Summary
+        if: success()
+        run: |
+          echo "## Base Infrastructure Deployment Complete" >> $GITHUB_STEP_SUMMARY

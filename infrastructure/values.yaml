@@ -1,0 +1,12 @@
+# Let's Encrypt configuration
+letsencrypt:
+  # Email address for Let's Encrypt certificate notifications
+  email: "infra@lukaswoellhaf.com"
+
+# Deployment service account configuration
+deployment:
+  serviceAccount:
+    # Name of the service account for CD pipelines
+    name: deployment
+    # Namespace where the service account will be created
+    namespace: default
