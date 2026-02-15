@@ -1,0 +1,57 @@
+name: Install k3s
+
+on:
+  workflow_dispatch:
+
+jobs:
+  install-k3s:
+    name: Install k3s using k3sup
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Install k3sup
+        run: |
+          echo "Installing k3sup..."
+          curl -sLS https://get.k3sup.dev | sh
+          sudo install k3sup /usr/local/bin/
+          k3sup version
+      
+      - name: Configure SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Add server to known_hosts
+        run: |
+          ssh-keyscan -H ${{ vars.SERVER_IP }} >> ~/.ssh/known_hosts
+      
+      - name: Test SSH connectivity
+        run: |
+          echo "Testing SSH connectivity to ${{ vars.SERVER_IP }}..."
+          ssh -o ConnectTimeout=10 root@${{ vars.SERVER_IP }} "echo 'SSH connection successful'"
+      
+      - name: Install k3s with k3sup
+        run: |
+          echo "Installing k3s on ${{ vars.SERVER_IP }}..."
+          k3sup install \
+            --ip ${{ vars.SERVER_IP }} \
+            --user root \
+            --k3s-version v1.35.1+k3s1 \
+            --k3s-extra-args '--disable servicelb --tls-san ${{ vars.SERVER_IP }} --tls-san ${{ vars.DOMAIN_NAME }}' \
+            --local-path $HOME/.kube/config \
+            --context home-sweet-cloud
+          
+          echo "k3s installation complete"
+      
+      - name: Verify k3s cluster
+        run: |
+          echo "Verifying k3s cluster..."
+          kubectl get nodes
+      
+      - name: Summary
+        if: success()
+        run: |
+          echo "## k3s Installation Complete" >> $GITHUB_STEP_SUMMARY
