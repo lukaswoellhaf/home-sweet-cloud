@@ -32,13 +32,16 @@ jobs:
           echo "Testing SSH connectivity to ${{ vars.SERVER_IP }}..."
           ssh -o ConnectTimeout=10 root@${{ vars.SERVER_IP }} "echo 'SSH connection successful'"
       
+      - name: Create .kube directory
+        run: mkdir -p $HOME/.kube
+      
       - name: Install k3s with k3sup
         run: |
           echo "Installing k3s on ${{ vars.SERVER_IP }}..."
           k3sup install \
             --ip ${{ vars.SERVER_IP }} \
             --user root \
-            --k3s-version v1.35.1+k3s1 \
+            --k3s-version stable \
             --k3s-extra-args '--disable servicelb --tls-san ${{ vars.SERVER_IP }} --tls-san ${{ vars.DOMAIN_NAME }}' \
             --local-path $HOME/.kube/config \
             --context home-sweet-cloud
