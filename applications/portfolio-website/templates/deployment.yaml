@@ -39,3 +39,13 @@ spec:
           {{- toYaml .Values.resources | nindent 10 }}
         securityContext:
           {{- toYaml .Values.securityContext | nindent 10 }}
+        volumeMounts:
+        - name: cache
+          mountPath: /var/cache/nginx
+        - name: run
+          mountPath: /var/run
+      volumes:
+      - name: cache
+        emptyDir: {}
+      - name: run
+        emptyDir: {}
