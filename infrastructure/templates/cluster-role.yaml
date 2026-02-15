@@ -40,7 +40,7 @@ rules:
   # Namespaces (read and create for multi-tenant deployments)
   - apiGroups: [""]
     resources: ["namespaces"]
-    verbs: ["get", "list", "watch", "create"]
+    verbs: ["get", "list", "watch", "create", "patch"]
   
   # Service accounts (for creating app-specific service accounts)
   - apiGroups: [""]
