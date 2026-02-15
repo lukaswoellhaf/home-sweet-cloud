@@ -42,7 +42,7 @@ jobs:
             --ip ${{ vars.SERVER_IP }} \
             --user root \
             --k3s-version v1.35.1+k3s1 \
-            --k3s-extra-args '--disable servicelb --tls-san ${{ vars.SERVER_IP }} --tls-san ${{ vars.DOMAIN_NAME }}' \
+            --k3s-extra-args '--tls-san ${{ vars.SERVER_IP }} --tls-san ${{ vars.DOMAIN_NAME }}' \
             --local-path $HOME/.kube/config \
             --context home-sweet-cloud
           
