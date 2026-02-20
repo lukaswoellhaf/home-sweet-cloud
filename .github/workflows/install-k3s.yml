@@ -19,7 +19,7 @@ jobs:
           k3sup version
       
       - name: Configure SSH key
-        uses: webfactory/ssh-agent@v0.9.0
+        uses: webfactory/ssh-agent@v0.9.1
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       
