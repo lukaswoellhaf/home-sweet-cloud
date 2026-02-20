@@ -71,6 +71,9 @@ jobs:
         uses: azure/setup-helm@v4
         with:
           version: 'latest'
+
+      - name: Build Helm dependencies
+        run: helm dependency build infrastructure/
       
       - name: Deploy infrastructure Helm Charts
         run: |
