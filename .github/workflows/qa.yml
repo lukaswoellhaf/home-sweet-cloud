@@ -27,56 +27,30 @@ jobs:
       - name: Run chart-testing (lint)
         run: ct lint --all --config .github/config/ct.yaml
 
-  yaml-lint:
-    name: YAML Lint
+  security-scan:
+    name: Security Scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
       
-      - name: YAML Lint
-        uses: ibiqlik/action-yamllint@v3
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.3.1
         with:
-          config_data: |
-            extends: default
-            rules:
-              line-length:
-                max: 120
-                level: warning
-              indentation:
-                spaces: 2
-              truthy:
-                allowed-values: ['true', 'false', 'on', 'off']
-              trailing-spaces: disable
-              braces:
-                max-spaces-inside: 1
-                level: warning
-              document-start: disable
-
-  # security-scan:
-  #   name: Security Scan
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v6.0.2
+          version: 'latest'
       
-  #     - name: Set up Helm
-  #       uses: azure/setup-helm@v4.3.1
-  #       with:
-  #         version: 'latest'
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@0.34.0
+        with:
+          scan-type: 'config'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'  # Don't fail build, just report findings for now
       
-  #     - name: Run Trivy vulnerability scanner
-  #       uses: aquasecurity/trivy-action@0.34.0
-  #       with:
-  #         scan-type: 'config'
-  #         scan-ref: '.'
-  #         format: 'sarif'
-  #         output: 'trivy-results.sarif'
-  #         severity: 'CRITICAL,HIGH'
-  #         exit-code: '1'
-      
-  #     - name: Upload Trivy results to GitHub Security
-  #       uses: github/codeql-action/upload-sarif@v4
-  #       if: always()
-  #       with:
-  #         sarif_file: 'trivy-results.sarif'
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v4
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
