@@ -46,7 +46,12 @@ jobs:
               indentation:
                 spaces: 2
               truthy:
-                allowed-values: ['true', 'false']
+                allowed-values: ['true', 'false', 'on', 'off']
+              trailing-spaces: disable
+              braces:
+                max-spaces-inside: 1
+                level: warning
+              document-start: disable
 
   # security-scan:
   #   name: Security Scan
