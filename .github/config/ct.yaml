@@ -1,0 +1,7 @@
+# Chart testing configuration
+chart-dirs:
+  - infrastructure
+  - applications
+
+validate-maintainers: false
+check-version-increment: false

@@ -1,0 +1,22 @@
+# Gitleaks configuration file
+# Docs: https://github.com/gitleaks/gitleaks
+
+title = "Gitleaks Configuration"
+
+[extend]
+# Use default gitleaks rules
+useDefault = true
+
+[allowlist]
+description = "Allowlisted files and patterns"
+
+# Ignore test files or mock secrets
+paths = [
+  '''.*test.*''',
+  '''.*example.*''',
+]
+
+# Add specific regexes to ignore if needed
+# regexes = [
+#   '''safe-pattern-here''',
+# ]
