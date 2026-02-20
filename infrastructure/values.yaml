@@ -34,8 +34,5 @@ headlamp:
   ingress:
     enabled: false
   
-  config:
-    baseURL: ""
-  
   persistentVolumeClaim:
     enabled: false
