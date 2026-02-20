@@ -10,3 +10,32 @@ deployment:
     name: deployment
     # Namespace where the service account will be created
     namespace: default
+
+# Headlamp dashboard configuration
+headlamp:
+  replicaCount: 1
+  
+  image:
+    registry: ghcr.io
+    repository: headlamp-k8s/headlamp
+  
+  resources:
+    limits:
+      cpu: 100m
+      memory: 256Mi
+    requests:
+      cpu: 50m
+      memory: 128Mi
+  
+  service:
+    type: ClusterIP
+    port: 80
+  
+  ingress:
+    enabled: false
+  
+  config:
+    baseURL: ""
+  
+  persistentVolumeClaim:
+    enabled: false

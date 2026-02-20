@@ -11,3 +11,8 @@ keywords:
 maintainers:
   - name: Lukas Wöllhaf
     email: infra@lukaswoellhaf.com
+
+dependencies:
+  - name: headlamp
+    version: "0.24.0"
+    repository: https://headlamp-k8s.github.io/headlamp/
