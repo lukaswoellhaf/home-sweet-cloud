@@ -13,10 +13,10 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       
       - name: Checkout repository lukaswoellhafcom
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: lukaswoellhaf/lukaswoellhafcom
           path: lukaswoellhafcom
