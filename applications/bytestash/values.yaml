@@ -21,13 +21,13 @@ app:
 
 bytestash:
   basePath: ""
-  jwtSecret: "change-this-to-a-secure-random-string" # Will be overridden in workflow with actual secret
+  jwtSecret: "change-this-to-a-secure-random-string"  # Will be overridden in workflow with actual secret
   tokenExpiry: "24h"
   allowNewAccounts: "false"  # Only first user can register (becomes admin), then signups are closed
   debug: "false"
   disableAccounts: "false"
   disableInternalAccounts: "false"
-  
+
   # OIDC configuration (optional)
   oidc:
     enabled: "false"
@@ -97,4 +97,4 @@ securityContext:
   capabilities:
     drop:
       - ALL
-  readOnlyRootFilesystem: false
+  readOnlyRootFilesystem: true

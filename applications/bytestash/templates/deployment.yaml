@@ -71,6 +71,10 @@ spec:
         {{- end }}
         - name: tmp
           mountPath: /tmp
+        - name: cache
+          mountPath: /app/.cache
+        - name: logs
+          mountPath: /app/logs
       volumes:
       {{- if .Values.persistence.enabled }}
       - name: data
@@ -78,4 +82,8 @@ spec:
           claimName: {{ .Chart.Name }}-data
       {{- end }}
       - name: tmp
+        emptyDir: {}
+      - name: cache
+        emptyDir: {}
+      - name: logs
         emptyDir: {}
