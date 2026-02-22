@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: {{ .Chart.Name }}
+    version: {{ .Values.image.tag | quote }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+        version: {{ .Values.image.tag | quote }}
+    spec:
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.app.port }}
+          protocol: TCP
+        env:
+        - name: BASE_PATH
+          value: {{ .Values.bytestash.basePath | quote }}
+        - name: JWT_SECRET
+          value: {{ .Values.bytestash.jwtSecret | quote }}
+        - name: TOKEN_EXPIRY
+          value: {{ .Values.bytestash.tokenExpiry | quote }}
+        - name: ALLOW_NEW_ACCOUNTS
+          value: {{ .Values.bytestash.allowNewAccounts | quote }}
+        - name: DEBUG
+          value: {{ .Values.bytestash.debug | quote }}
+        - name: DISABLE_ACCOUNTS
+          value: {{ .Values.bytestash.disableAccounts | quote }}
+        - name: DISABLE_INTERNAL_ACCOUNTS
+          value: {{ .Values.bytestash.disableInternalAccounts | quote }}
+        - name: OIDC_ENABLED
+          value: {{ .Values.bytestash.oidc.enabled | quote }}
+        {{- if .Values.bytestash.oidc.enabled }}
+        - name: OIDC_DISPLAY_NAME
+          value: {{ .Values.bytestash.oidc.displayName | quote }}
+        - name: OIDC_ISSUER_URL
+          value: {{ .Values.bytestash.oidc.issuerUrl | quote }}
+        - name: OIDC_CLIENT_ID
+          value: {{ .Values.bytestash.oidc.clientId | quote }}
+        - name: OIDC_CLIENT_SECRET
+          value: {{ .Values.bytestash.oidc.clientSecret | quote }}
+        - name: OIDC_SCOPES
+          value: {{ .Values.bytestash.oidc.scopes | quote }}
+        {{- end }}
+        livenessProbe:
+          {{- toYaml .Values.livenessProbe | nindent 10 }}
+        readinessProbe:
+          {{- toYaml .Values.readinessProbe | nindent 10 }}
+        resources:
+          {{- toYaml .Values.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 10 }}
+        volumeMounts:
+        {{- if .Values.persistence.enabled }}
+        - name: data
+          mountPath: {{ .Values.persistence.mountPath }}
+        {{- end }}
+        - name: tmp
+          mountPath: /tmp
+        - name: cache
+          mountPath: /app/.cache
+        - name: logs
+          mountPath: /app/logs
+      volumes:
+      {{- if .Values.persistence.enabled }}
+      - name: data
+        persistentVolumeClaim:
+          claimName: {{ .Chart.Name }}-data
+      {{- end }}
+      - name: tmp
+        emptyDir: {}
+      - name: cache
+        emptyDir: {}
+      - name: logs
+        emptyDir: {}

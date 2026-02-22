@@ -1,0 +1,100 @@
+# Default values for bytestash
+
+image:
+  repository: ghcr.io/jordan-dalby/bytestash
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+namespace:
+  name: code
+  create: true
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 5000
+
+app:
+  port: 5000
+
+bytestash:
+  basePath: ""
+  jwtSecret: "change-this-to-a-secure-random-string"  # Will be overridden in workflow with actual secret
+  tokenExpiry: "24h"
+  allowNewAccounts: "false"  # Only first user can register (becomes admin), then signups are closed
+  debug: "false"
+  disableAccounts: "false"
+  disableInternalAccounts: "false"
+
+  # OIDC configuration (optional)
+  oidc:
+    enabled: "false"
+    displayName: ""
+    issuerUrl: ""
+    clientId: ""
+    clientSecret: ""
+    scopes: ""
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+  hosts:
+    - host: code.lukaswoellhaf.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: code-lukaswoellhaf-com-tls
+      hosts:
+        - code.lukaswoellhaf.com
+
+persistence:
+  enabled: true
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  size: 5Gi
+  mountPath: /data/snippets
+
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 200m
+    memory: 256Mi
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /api/health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true

@@ -1,0 +1,12 @@
+apiVersion: v2
+name: bytestash
+description: ByteStash code snippet manager
+type: application
+version: 1.0.0
+appVersion: "latest"
+keywords:
+  - code-snippets
+  - bytestash
+maintainers:
+  - name: Lukas Wöllhaf
+    email: infra@lukaswoellhaf.com
