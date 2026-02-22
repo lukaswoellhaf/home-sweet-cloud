@@ -42,7 +42,7 @@ ingress:
   className: traefik
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+    traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd,code-bytestash-root-redirect@kubernetescrd
   hosts:
     - host: code.lukaswoellhaf.com
       paths:

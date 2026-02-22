@@ -1,0 +1,10 @@
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: {{ .Chart.Name }}-root-redirect
+  namespace: {{ .Values.namespace.name }}
+spec:
+  redirectRegex:
+    regex: "^https://([^/]+)/?$"
+    replacement: "https://${1}/public/snippets"
+    permanent: false
