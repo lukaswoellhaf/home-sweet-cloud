@@ -61,3 +61,8 @@ rules:
   - apiGroups: ["cert-manager.io"]
     resources: ["certificates", "certificaterequests", "issuers"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+  
+  # Traefik resources
+  - apiGroups: ["traefik.io"]
+    resources: ["middlewares", "ingressroutes", "ingressroutetcps", "ingressrouteudps", "tlsoptions", "tlsstores", "traefikservices"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
