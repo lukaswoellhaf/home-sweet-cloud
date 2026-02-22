@@ -30,9 +30,9 @@ The infrastructure chart provides:
 
 ## Applications
 
-[**ByteStash**](https://github.com/jordan-dalby/ByteStash) - Self-hosted code snippet manager with authentication and OIDC support. Accessible at [code.lukaswoellhaf.com](code.lukaswoellhaf.com)
+[**ByteStash**](https://github.com/jordan-dalby/ByteStash) - Self-hosted code snippet manager with authentication and OIDC support. Accessible at [code.lukaswoellhaf.com](https://code.lukaswoellhaf.com)
 
-[**Portfolio Website**](https://github.com/lukaswoellhaf/lukaswoellhafcom) - Personal portfolio website. Accesible at [lukaswoellhaf.com](lukaswoellhaf.com)
+[**Portfolio Website**](https://github.com/lukaswoellhaf/lukaswoellhafcom) - Personal portfolio website. Accesible at [lukaswoellhaf.com](https://lukaswoellhaf.com)
 
 ## DNS Configuration
 
