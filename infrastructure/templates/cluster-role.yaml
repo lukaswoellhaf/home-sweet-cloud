@@ -81,3 +81,8 @@ rules:
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterroles", "clusterrolebindings", "roles", "rolebindings"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  # Admission webhooks (required for kube-prometheus-stack)
+  - apiGroups: ["admissionregistration.k8s.io"]
+    resources: ["mutatingwebhookconfigurations", "validatingwebhookconfigurations"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
