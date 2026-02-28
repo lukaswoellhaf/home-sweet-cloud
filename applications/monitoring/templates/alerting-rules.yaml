@@ -1,0 +1,63 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: home-sweet-cloud-alerts
+spec:
+  groups:
+    - name: cluster.rules
+      rules:
+        - alert: NodeHighMemoryUsage
+          expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.90
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Node memory usage above 90%"
+            description: "Node {{"{{"}} $labels.instance {{"}}"}} memory usage is {{"{{"}} $value | humanizePercentage {{"}}"}}."
+
+        - alert: NodeHighCPUUsage
+          expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Node CPU usage above 90%"
+            description: "Node {{"{{"}} $labels.instance {{"}}"}} CPU usage is {{"{{"}} printf \"%.1f\" $value {{"}}"}}%."
+
+        - alert: NodeDiskSpaceLow
+          expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.15
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Node disk space below 15%"
+            description: "Node {{"{{"}} $labels.instance {{"}}"}} has {{"{{"}} $value | humanizePercentage {{"}}"}} disk space remaining."
+
+    - name: application.rules
+      rules:
+        - alert: PodCrashLooping
+          expr: kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"} > 0
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Pod is crash looping"
+            description: "Pod {{"{{"}} $labels.namespace {{"}}"}}/{{"{{"}} $labels.pod {{"}}"}} is in CrashLoopBackOff."
+
+        - alert: PodNotReady
+          expr: kube_pod_status_ready{condition="true"} == 0
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "Pod not ready"
+            description: "Pod {{"{{"}} $labels.namespace {{"}}"}}/{{"{{"}} $labels.pod {{"}}"}} has been not ready for more than 10 minutes."
+
+        - alert: PersistentVolumeFillingUp
+          expr: (kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes) < 0.15
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "PersistentVolume is filling up"
+            description: "PersistentVolume {{"{{"}} $labels.persistentvolumeclaim {{"}}"}} in namespace {{"{{"}} $labels.namespace {{"}}"}} has {{"{{"}} $value | humanizePercentage {{"}}"}} space remaining."

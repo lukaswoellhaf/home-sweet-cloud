@@ -12,6 +12,7 @@ on:
           - all
           - portfolio-website
           - bytestash
+          - monitoring
 
 env:
   KUBECONFIG: /tmp/kubeconfig
@@ -143,3 +144,57 @@ jobs:
             --wait \
             --timeout 5m
           echo "ByteStash deployed successfully" >> $GITHUB_STEP_SUMMARY
+
+  deploy-monitoring:
+    name: Deploy Monitoring
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.application == 'all' || github.event.inputs.application == 'monitoring' }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
+      
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'latest'
+      
+      - name: Configure kubectl with service account
+        run: |
+          CLUSTER_NAME="home-sweet-cloud"
+          CLUSTER_API="https://${{ vars.SERVER_IP }}:6443"
+          
+          kubectl config set-cluster "$CLUSTER_NAME" \
+            --server="$CLUSTER_API" \
+            --certificate-authority=<(echo "${{ secrets.CLUSTER_CA_CERT }}" | base64 -d) \
+            --embed-certs=true
+          
+          kubectl config set-credentials deployment-sa \
+            --token="${{ secrets.DEPLOYMENT_SA_TOKEN }}"
+          
+          kubectl config set-context deployment \
+            --cluster="$CLUSTER_NAME" \
+            --user=deployment-sa
+          
+          kubectl config use-context deployment
+          kubectl cluster-info
+      
+      - name: Build Helm dependencies
+        run: helm dependency build applications/monitoring/
+      
+      - name: Deploy monitoring
+        run: |
+          helm upgrade --install monitoring ./applications/monitoring \
+            --namespace monitoring \
+            --create-namespace \
+            --wait \
+            --timeout 10m \
+            --set kube-prometheus-stack.grafana.adminUser=${{ secrets.GRAFANA_ADMIN_USERNAME }} \
+            --set kube-prometheus-stack.grafana.adminPassword=${{ secrets.GRAFANA_ADMIN_PASSWORD }} \
+            --set "kube-prometheus-stack.alertmanager.config.receivers[1].slack_configs[0].api_url=${{ secrets.DISCORD_WEBHOOK_URL }}"
+          echo "Monitoring deployed successfully" >> $GITHUB_STEP_SUMMARY
