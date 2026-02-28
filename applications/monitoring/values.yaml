@@ -185,6 +185,11 @@ loki:
     enabled: false
   lokiCanary:
     enabled: false
+  # Disable all caching components (memcached) - not needed for single-node
+  chunksCache:
+    enabled: false
+  resultsCache:
+    enabled: false
 
 # Log collector configuration
 promtail:
