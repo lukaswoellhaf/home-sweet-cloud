@@ -117,6 +117,13 @@ kube-prometheus-stack:
     # Set via --set with GRAFANA_ADMIN_USERNAME/GRAFANA_ADMIN_PASSWORD as GitHub secrets in workflow
     adminUser: ""
     adminPassword: ""
+    additionalDataSources:
+      - name: Alertmanager
+        type: alertmanager
+        url: http://monitoring-kube-prometheus-alertmanager:9093
+        access: proxy
+        jsonData:
+          implementation: prometheus
 
   prometheus-node-exporter:
     resources:
