@@ -80,9 +80,72 @@ rules:
   # RBAC (required for Helm charts that create roles, e.g. kube-prometheus-stack)
   - apiGroups: ["rbac.authorization.k8s.io"]
     resources: ["clusterroles", "clusterrolebindings", "roles", "rolebindings"]
-    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "escalate", "bind"]
 
   # Admission webhooks (required for kube-prometheus-stack)
   - apiGroups: ["admissionregistration.k8s.io"]
     resources: ["mutatingwebhookconfigurations", "validatingwebhookconfigurations"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  # Node access (required by node-exporter, kube-state-metrics, prometheus)
+  - apiGroups: [""]
+    resources: ["nodes", "nodes/proxy", "nodes/metrics"]
+    verbs: ["get", "list", "watch"]
+
+  # Additional cluster-level resources (required by kube-state-metrics and prometheus-operator)
+  - apiGroups: [""]
+    resources: ["limitranges", "persistentvolumes", "replicationcontrollers", "resourcequotas"]
+    verbs: ["list", "watch"]
+
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["get", "list", "watch", "create", "patch"]
+
+  # Pod delete (required by prometheus-operator)
+  - apiGroups: [""]
+    resources: ["pods"]
+    verbs: ["delete"]
+
+  # Service finalizers (required by prometheus-operator)
+  - apiGroups: [""]
+    resources: ["services/finalizers"]
+    verbs: ["get", "create", "update", "delete"]
+
+  # Endpoint slices (required by prometheus-operator and prometheus)
+  - apiGroups: ["discovery.k8s.io"]
+    resources: ["endpointslices"]
+    verbs: ["get", "list", "watch", "create", "update", "delete"]
+
+  # Storage classes and volume attachments (required by kube-state-metrics)
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses", "volumeattachments"]
+    verbs: ["get", "list", "watch"]
+
+  # Network policies (required by kube-state-metrics)
+  - apiGroups: ["networking.k8s.io"]
+    resources: ["networkpolicies"]
+    verbs: ["list", "watch"]
+
+  # Pod disruption budgets (required by kube-state-metrics)
+  - apiGroups: ["policy"]
+    resources: ["poddisruptionbudgets"]
+    verbs: ["list", "watch"]
+
+  # Leases (required by kube-state-metrics)
+  - apiGroups: ["coordination.k8s.io"]
+    resources: ["leases"]
+    verbs: ["list", "watch"]
+
+  # Certificate signing requests (required by kube-state-metrics)
+  - apiGroups: ["certificates.k8s.io"]
+    resources: ["certificatesigningrequests"]
+    verbs: ["list", "watch"]
+
+  # Events API group (required by prometheus-operator)
+  - apiGroups: ["events.k8s.io"]
+    resources: ["events"]
+    verbs: ["patch", "create"]
+
+  # Non-resource URLs (required by prometheus for /metrics scraping)
+  - nonResourceURLs: ["/metrics", "/metrics/cadvisor"]
+    verbs: ["get"]
