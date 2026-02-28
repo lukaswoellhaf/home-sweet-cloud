@@ -73,7 +73,7 @@ kube-prometheus-stack:
         - name: 'null'
         - name: 'discord'
           slack_configs:
-            - api_url: '' # Set via --set with DISCORD_WEBHOOK_URL as GitHub secret in workflow
+            - api_url: ''  # Set via --set with DISCORD_WEBHOOK_URL as GitHub secret in workflow
               send_resolved: true
               title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}'
               text: |-
