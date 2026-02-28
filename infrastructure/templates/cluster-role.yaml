@@ -66,3 +66,18 @@ rules:
   - apiGroups: ["traefik.io"]
     resources: ["middlewares", "ingressroutes", "ingressroutetcps", "ingressrouteudps", "tlsoptions", "tlsstores", "traefikservices"]
     verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  # CRDs (required for installing Helm charts that manage their own CRDs, e.g. kube-prometheus-stack)
+  - apiGroups: ["apiextensions.k8s.io"]
+    resources: ["customresourcedefinitions"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  # Prometheus operator resources
+  - apiGroups: ["monitoring.coreos.com"]
+    resources: ["prometheuses", "alertmanagers", "prometheusrules", "servicemonitors", "podmonitors", "alertmanagerconfigs", "prometheusagents", "scrapeconfigs", "thanosrulers"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+
+  # RBAC (required for Helm charts that create roles, e.g. kube-prometheus-stack)
+  - apiGroups: ["rbac.authorization.k8s.io"]
+    resources: ["clusterroles", "clusterrolebindings", "roles", "rolebindings"]
+    verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
