@@ -1,0 +1,191 @@
+# Monitoring stack configuration
+kube-prometheus-stack:
+  crds:
+    # Auto-upgrade CRDs as part of helm upgrade (required when crossing major versions)
+    upgradeJob:
+      enabled: true
+
+  # Disable components not accessible/relevant in k3s
+  kubeEtcd:
+    enabled: false
+  kubeControllerManager:
+    enabled: false
+  kubeScheduler:
+    enabled: false
+  kubeProxy:
+    enabled: false
+
+  prometheus:
+    prometheusSpec:
+      # Pick up all ServiceMonitors and PrometheusRules regardless of labels
+      serviceMonitorSelectorNilUsesHelmValues: false
+      ruleSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      retention: 7d
+      resources:
+        requests:
+          cpu: 50m
+          memory: 256Mi
+        limits:
+          cpu: 200m
+          memory: 768Mi
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi
+
+  alertmanager:
+    alertmanagerSpec:
+      resources:
+        requests:
+          cpu: 10m
+          memory: 32Mi
+        limits:
+          cpu: 50m
+          memory: 64Mi
+      storage:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 1Gi
+    config:
+      global:
+        resolve_timeout: 5m
+      route:
+        group_by: ['namespace', 'alertname']
+        group_wait: 30s
+        group_interval: 5m
+        repeat_interval: 12h
+        receiver: 'discord'
+        routes:
+          - matchers:
+              - alertname = "InfoInhibitor"
+            receiver: 'null'
+          - matchers:
+              - severity =~ "warning|critical"
+            receiver: 'discord'
+      receivers:
+        - name: 'null'
+        - name: 'discord'
+          slack_configs:
+            - api_url: '' # Set via --set with DISCORD_WEBHOOK_URL as GitHub secret in workflow
+              send_resolved: true
+              title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}'
+              text: |-
+                {{ range .Alerts }}
+                *Alert:* {{ .Annotations.summary }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
+                *Description:* {{ .Annotations.description }}
+                *Namespace:* {{ .Labels.namespace }}
+                {{ end }}
+
+  grafana:
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 256Mi
+    persistence:
+      enabled: true
+      size: 2Gi
+    grafana.ini:
+      server:
+        root_url: https://grafana.lukaswoellhaf.com
+      auth.anonymous:
+        enabled: false
+      auth:
+        disable_login_form: false
+    ingress:
+      enabled: true
+      ingressClassName: traefik
+      annotations:
+        cert-manager.io/cluster-issuer: "letsencrypt-prod"
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+      hosts:
+        - grafana.lukaswoellhaf.com
+      tls:
+        - secretName: grafana-tls
+          hosts:
+            - grafana.lukaswoellhaf.com
+    # Set via --set with GRAFANA_ADMIN_USERNAME/GRAFANA_ADMIN_PASSWORD as GitHub secrets in workflow
+    adminUser: ""
+    adminPassword: ""
+
+  prometheus-node-exporter:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 50m
+        memory: 64Mi
+
+  kube-state-metrics:
+    resources:
+      requests:
+        cpu: 10m
+        memory: 32Mi
+      limits:
+        cpu: 50m
+        memory: 64Mi
+
+# Log aggregation configuration
+loki:
+  deploymentMode: SingleBinary
+  loki:
+    auth_enabled: false
+    commonConfig:
+      replication_factor: 1
+    limits_config:
+      retention_period: 168h  # 7 days
+    compactor:
+      retention_enabled: true
+    storage:
+      type: filesystem
+  singleBinary:
+    replicas: 1
+    resources:
+      requests:
+        cpu: 20m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    persistence:
+      enabled: true
+      size: 10Gi
+  # Disable unneeded components for single-node setup
+  gateway:
+    enabled: false
+  minio:
+    enabled: false
+  backend:
+    replicas: 0
+  read:
+    replicas: 0
+  write:
+    replicas: 0
+  test:
+    enabled: false
+  lokiCanary:
+    enabled: false
+
+# Log collector configuration
+promtail:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 32Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+  config:
+    clients:
+      - url: http://monitoring-loki:3100/loki/api/v1/push

@@ -9,12 +9,16 @@ Infrastructure as Code repository for creating and managing a personal Kubernete
 - **Helm** - Kubernetes package manager
 - **cert-manager** - Automated SSL/TLS certificate management
 - **Traefik** - Ingress controller
+- **Prometheus & Alertmanager** - Metrics collection and alerting
+- **Grafana** - Metrics visualization
+- **Loki & Promtail** - Log aggregation
 
 ## Project Structure
 
 ```
 infrastructure/     Base cluster setup (cert-manager, Traefik, RBAC, Headlamp)
 applications/       Application deployments
+  monitoring/       Prometheus, Grafana, Alertmanager, Loki
   bytestash/        Code snippet manager
   portfolio-website/ Personal website
 ```
@@ -39,19 +43,31 @@ The infrastructure chart provides:
 Domains managed via Netcup.
 - `lukaswoellhaf.com` (domain)
 - `code.lukaswoellhaf.com` (subdomain)
+- `grafana.lukaswoellhaf.com` (subdomain)
 
 Required DNS records:
 
 ```
-@       A       <server-ip>           # Root domain IPv4
-@       AAAA    <server-ipv6>         # Root domain IPv6
-code    A       <server-ip>           # Subdomain IPv4
-code    AAAA    <server-ipv6>         # Subdomain IPv6
-www     CNAME   @                     # Redirect www to root domain
-@       MX      10 <mx-server-1>      # Primary mail server
-@       MX      20 <mx-server-2>      # Secondary mail server
-@       TXT     <spf-record>          # SPF record for email authentication
+@         A       <server-ip>           # Root domain IPv4
+@         AAAA    <server-ipv6>         # Root domain IPv6
+code      A       <server-ip>           # Subdomain IPv4
+code      AAAA    <server-ipv6>         # Subdomain IPv6
+grafana   A       <server-ip>           # Subdomain IPv4
+grafana   AAAA    <server-ipv6>         # Subdomain IPv6
+www       CNAME   @                     # Redirect www to root domain
+@         MX      10 <mx-server-1>      # Primary mail server
+@         MX      20 <mx-server-2>      # Secondary mail server
+@         TXT     <spf-record>          # SPF record for email authentication
 ```
+
+## Monitoring
+
+Metrics and logs are retained for **7 days**. Grafana is accessible at [grafana.lukaswoellhaf.com](https://grafana.lukaswoellhaf.com).
+
+Alerting routes `warning` and `critical` alerts to Discord. The webhook URL is set via the `DISCORD_WEBHOOK_URL` GitHub secret. Custom alert rules cover:
+- Node high CPU/memory usage (>90%) and low disk space (<15%)
+- Pod crash looping or not ready for >10 minutes
+- PersistentVolume filling up (<15% free)
 
 ## Cluster Provisioning
 
@@ -61,7 +77,7 @@ All cluster configurations and deployments are automated via GitHub Actions pipe
 2. **Deploy Infrastructure**: Run `deploy-base-infra` workflow to install cert-manager and base infrastructure
 3. **Deploy Applications**: Run `deploy-apps` workflow to deploy individual applications
 
-Required GitHub secrets: `SSH_PRIVATE_KEY`, `PAT_SECRET_MANAGER` (for automatic secret management), application-specific secrets.
+Required GitHub secrets: `SSH_PRIVATE_KEY`, `PAT_SECRET_MANAGER` (for automatic secret management), `GRAFANA_ADMIN_USERNAME`, `GRAFANA_ADMIN_PASSWORD`, `DISCORD_WEBHOOK_URL`, and application-specific secrets.
 
 ## Local Development
 
