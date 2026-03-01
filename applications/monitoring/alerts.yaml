@@ -38,6 +38,7 @@ kube-prometheus-stack:
                 title: NodeHighMemoryUsage
                 condition: A
                 noDataState: OK
+                execErrState: OK
                 for: 5m
                 labels:
                   severity: warning
@@ -52,12 +53,16 @@ kube-prometheus-stack:
                       to: 0
                     model:
                       expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.90
-                      instant: true
+                      instant: false
+                      range: true
+                      intervalMs: 1000
+                      maxDataPoints: 43200
                       refId: A
               - uid: node-high-cpu-usage
                 title: NodeHighCPUUsage
                 condition: A
                 noDataState: OK
+                execErrState: OK
                 for: 5m
                 labels:
                   severity: warning
@@ -71,13 +76,17 @@ kube-prometheus-stack:
                       from: 600
                       to: 0
                     model:
-                      expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
-                      instant: true
+                      expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m]))) * 100 > 90
+                      instant: false
+                      range: true
+                      intervalMs: 1000
+                      maxDataPoints: 43200
                       refId: A
               - uid: node-disk-space-low
                 title: NodeDiskSpaceLow
                 condition: A
                 noDataState: OK
+                execErrState: OK
                 for: 5m
                 labels:
                   severity: warning
@@ -91,8 +100,11 @@ kube-prometheus-stack:
                       from: 600
                       to: 0
                     model:
-                      expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.15
-                      instant: true
+                      expr: (node_filesystem_avail_bytes{mountpoint="/",fstype="ext4"} / node_filesystem_size_bytes{mountpoint="/",fstype="ext4"}) < 0.15
+                      instant: false
+                      range: true
+                      intervalMs: 1000
+                      maxDataPoints: 43200
                       refId: A
           - orgId: 1
             name: application.rules
