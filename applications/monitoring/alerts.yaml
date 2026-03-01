@@ -42,6 +42,9 @@ kube-prometheus-stack:
                 data:
                   - refId: A
                     datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
                     model:
                       expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.90
                       instant: true
@@ -58,6 +61,9 @@ kube-prometheus-stack:
                 data:
                   - refId: A
                     datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
                     model:
                       expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
                       instant: true
@@ -74,6 +80,9 @@ kube-prometheus-stack:
                 data:
                   - refId: A
                     datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
                     model:
                       expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.15
                       instant: true
@@ -95,6 +104,9 @@ kube-prometheus-stack:
                 data:
                   - refId: A
                     datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
                     model:
                       expr: kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"} > 0
                       instant: true
@@ -111,6 +123,9 @@ kube-prometheus-stack:
                 data:
                   - refId: A
                     datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
                     model:
                       expr: kube_pod_status_ready{condition="true"} == 0
                       instant: true
@@ -127,6 +142,9 @@ kube-prometheus-stack:
                 data:
                   - refId: A
                     datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
                     model:
                       expr: (kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes) < 0.15
                       instant: true
