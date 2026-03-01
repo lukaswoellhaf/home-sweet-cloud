@@ -190,11 +190,12 @@ jobs:
       - name: Deploy monitoring
         run: |
           helm upgrade --install monitoring ./applications/monitoring \
+            -f ./applications/monitoring/alerts.yaml \
             --namespace monitoring \
             --create-namespace \
             --wait \
             --timeout 10m \
             --set kube-prometheus-stack.grafana.adminUser=${{ secrets.GRAFANA_ADMIN_USERNAME }} \
             --set kube-prometheus-stack.grafana.adminPassword=${{ secrets.GRAFANA_ADMIN_PASSWORD }} \
-            --set "kube-prometheus-stack.alertmanager.config.receivers[1].slack_configs[0].api_url=${{ secrets.DISCORD_WEBHOOK_URL }}"
+            --set "kube-prometheus-stack.grafana.env.DISCORD_WEBHOOK_URL=${{ secrets.DISCORD_WEBHOOK_URL }}"
           echo "Monitoring deployed successfully" >> $GITHUB_STEP_SUMMARY

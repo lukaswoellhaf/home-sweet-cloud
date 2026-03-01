@@ -1,0 +1,135 @@
+# Grafana alerting provisioning configuration
+kube-prometheus-stack:
+  grafana:
+    alerting:
+      contactpoints.yaml:
+        apiVersion: 1
+        contactPoints:
+          - orgId: 1
+            name: discord
+            receivers:
+              - uid: discord-receiver
+                type: discord
+                settings:
+                  url: $DISCORD_WEBHOOK_URL
+                disableResolveMessage: false
+      notification-policy.yaml:
+        apiVersion: 1
+        policies:
+          - orgId: 1
+            receiver: discord
+            group_by: [namespace, alertname]
+            group_wait: 30s
+            group_interval: 5m
+            repeat_interval: 12h
+            matchers:
+              - alertname !~ "InfoInhibitor"
+      rules.yaml:
+        apiVersion: 1
+        groups:
+          - orgId: 1
+            name: cluster.rules
+            folder: Infrastructure Alerts
+            interval: 1m
+            rules:
+              - uid: node-high-memory-usage
+                title: NodeHighMemoryUsage
+                condition: A
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Node memory usage above 90%"
+                  description: "Node memory usage is critically high."
+                data:
+                  - refId: A
+                    datasourceUid: prometheus
+                    model:
+                      expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.90
+                      instant: true
+                      refId: A
+              - uid: node-high-cpu-usage
+                title: NodeHighCPUUsage
+                condition: A
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Node CPU usage above 90%"
+                  description: "Node CPU usage is critically high."
+                data:
+                  - refId: A
+                    datasourceUid: prometheus
+                    model:
+                      expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
+                      instant: true
+                      refId: A
+              - uid: node-disk-space-low
+                title: NodeDiskSpaceLow
+                condition: A
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Node disk space below 15%"
+                  description: "Node disk space is critically low."
+                data:
+                  - refId: A
+                    datasourceUid: prometheus
+                    model:
+                      expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.15
+                      instant: true
+                      refId: A
+          - orgId: 1
+            name: application.rules
+            folder: Infrastructure Alerts
+            interval: 1m
+            rules:
+              - uid: pod-crash-looping
+                title: PodCrashLooping
+                condition: A
+                for: 5m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "Pod is crash looping"
+                  description: "A pod is in CrashLoopBackOff."
+                data:
+                  - refId: A
+                    datasourceUid: prometheus
+                    model:
+                      expr: kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"} > 0
+                      instant: true
+                      refId: A
+              - uid: pod-not-ready
+                title: PodNotReady
+                condition: A
+                for: 10m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Pod not ready"
+                  description: "A pod has been not ready for more than 10 minutes."
+                data:
+                  - refId: A
+                    datasourceUid: prometheus
+                    model:
+                      expr: kube_pod_status_ready{condition="true"} == 0
+                      instant: true
+                      refId: A
+              - uid: pv-filling-up
+                title: PersistentVolumeFillingUp
+                condition: A
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "PersistentVolume is filling up"
+                  description: "A PersistentVolume has less than 15% space remaining."
+                data:
+                  - refId: A
+                    datasourceUid: prometheus
+                    model:
+                      expr: (kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes) < 0.15
+                      instant: true
+                      refId: A
