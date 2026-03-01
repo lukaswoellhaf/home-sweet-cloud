@@ -60,9 +60,18 @@ kube-prometheus-stack:
       enabled: true
       size: 2Gi
     securityContext:
-      runAsUser: 472
-      runAsGroup: 472
       fsGroup: 472
+    initChownData:
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0
+        readOnlyRootFilesystem: true
+        capabilities:
+          add:
+            - CHOWN
+            - DAC_READ_SEARCH
+          drop:
+            - ALL
     grafana.ini:
       server:
         root_url: https://grafana.lukaswoellhaf.com
