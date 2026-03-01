@@ -17,9 +17,8 @@ kube-prometheus-stack:
 
   prometheus:
     prometheusSpec:
-      # Pick up all ServiceMonitors and PrometheusRules regardless of labels
+      # Pick up all ServiceMonitors and PodMonitors regardless of labels
       serviceMonitorSelectorNilUsesHelmValues: false
-      ruleSelectorNilUsesHelmValues: false
       podMonitorSelectorNilUsesHelmValues: false
       retention: 7d
       resources:
@@ -38,50 +37,8 @@ kube-prometheus-stack:
                 storage: 10Gi
 
   alertmanager:
-    alertmanagerSpec:
-      resources:
-        requests:
-          cpu: 10m
-          memory: 32Mi
-        limits:
-          cpu: 50m
-          memory: 64Mi
-      storage:
-        volumeClaimTemplate:
-          spec:
-            accessModes: ["ReadWriteOnce"]
-            resources:
-              requests:
-                storage: 1Gi
-    config:
-      global:
-        resolve_timeout: 5m
-      route:
-        group_by: ['namespace', 'alertname']
-        group_wait: 30s
-        group_interval: 5m
-        repeat_interval: 12h
-        receiver: 'discord'
-        routes:
-          - matchers:
-              - alertname = "InfoInhibitor"
-            receiver: 'null'
-          - matchers:
-              - severity =~ "warning|critical"
-            receiver: 'discord'
-      receivers:
-        - name: 'null'
-        - name: 'discord'
-          slack_configs:
-            - api_url: ''  # Set via --set with DISCORD_WEBHOOK_URL as GitHub secret in workflow
-              send_resolved: true
-              title: '[{{ .Status | toUpper }}{{ if eq .Status "firing" }}:{{ .Alerts.Firing | len }}{{ end }}] {{ .CommonLabels.alertname }}'
-              text: |-
-                {{ range .Alerts }}
-                *Alert:* {{ .Annotations.summary }}{{ if .Labels.severity }} - `{{ .Labels.severity }}`{{ end }}
-                *Description:* {{ .Annotations.description }}
-                *Namespace:* {{ .Labels.namespace }}
-                {{ end }}
+    # Disabled - Grafana Alerting handles routing and notifications
+    enabled: false
 
   grafana:
     resources:
@@ -101,6 +58,8 @@ kube-prometheus-stack:
         enabled: false
       auth:
         disable_login_form: false
+      unified_alerting:
+        enabled: true
     ingress:
       enabled: true
       ingressClassName: traefik
@@ -117,14 +76,10 @@ kube-prometheus-stack:
     # Set via --set with GRAFANA_ADMIN_USERNAME/GRAFANA_ADMIN_PASSWORD as GitHub secrets in workflow
     adminUser: ""
     adminPassword: ""
-    additionalDataSources:
-      - name: Alertmanager
-        type: alertmanager
-        url: http://monitoring-kube-prometheus-alertmanager:9093
-        access: proxy
-        jsonData:
-          implementation: prometheus
-          handleGrafanaManagedAlerts: false
+    # Discord webhook URL set via --set in workflow
+    # Alerting rules, contact points, and notification policy are in alerts.yaml
+    env:
+      DISCORD_WEBHOOK_URL: ""
 
   prometheus-node-exporter:
     resources:
