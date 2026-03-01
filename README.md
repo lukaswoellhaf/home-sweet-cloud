@@ -9,8 +9,8 @@ Infrastructure as Code repository for creating and managing a personal Kubernete
 - **Helm** - Kubernetes package manager
 - **cert-manager** - Automated SSL/TLS certificate management
 - **Traefik** - Ingress controller
-- **Prometheus & Alertmanager** - Metrics collection and alerting
-- **Grafana** - Metrics visualization
+- **Prometheus** - Metrics collection
+- **Grafana** - Metrics visualization and alerting
 - **Loki & Promtail** - Log aggregation
 
 ## Project Structure
@@ -18,7 +18,7 @@ Infrastructure as Code repository for creating and managing a personal Kubernete
 ```
 infrastructure/     Base cluster setup (cert-manager, Traefik, RBAC, Headlamp)
 applications/       Application deployments
-  monitoring/       Prometheus, Grafana, Alertmanager, Loki
+  monitoring/       Prometheus, Grafana, Loki
   bytestash/        Code snippet manager
   portfolio-website/ Personal website
 ```
@@ -64,7 +64,7 @@ www       CNAME   @                     # Redirect www to root domain
 
 Metrics and logs are retained for **7 days**. Grafana is accessible at [grafana.lukaswoellhaf.com](https://grafana.lukaswoellhaf.com).
 
-Alerting routes `warning` and `critical` alerts to Discord. The webhook URL is set via the `DISCORD_WEBHOOK_URL` GitHub secret. Custom alert rules cover:
+Grafana's native alerting sends `warning` and `critical` alerts to Discord via a provisioned contact point. The webhook URL is injected at deploy time via the `DISCORD_WEBHOOK_URL` GitHub secret. Custom alert rules cover:
 - Node high CPU/memory usage (>90%) and low disk space (<15%)
 - Pod crash looping or not ready for >10 minutes
 - PersistentVolume filling up (<15% free)
