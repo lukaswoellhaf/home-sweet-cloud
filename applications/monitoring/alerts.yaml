@@ -37,6 +37,7 @@ kube-prometheus-stack:
               - uid: node-high-memory-usage
                 title: NodeHighMemoryUsage
                 condition: A
+                noDataState: OK
                 for: 5m
                 labels:
                   severity: warning
@@ -56,6 +57,7 @@ kube-prometheus-stack:
               - uid: node-high-cpu-usage
                 title: NodeHighCPUUsage
                 condition: A
+                noDataState: OK
                 for: 5m
                 labels:
                   severity: warning
@@ -75,6 +77,7 @@ kube-prometheus-stack:
               - uid: node-disk-space-low
                 title: NodeDiskSpaceLow
                 condition: A
+                noDataState: OK
                 for: 5m
                 labels:
                   severity: warning
@@ -99,6 +102,7 @@ kube-prometheus-stack:
               - uid: pod-crash-looping
                 title: PodCrashLooping
                 condition: A
+                noDataState: OK
                 for: 5m
                 labels:
                   severity: critical
@@ -118,6 +122,7 @@ kube-prometheus-stack:
               - uid: pod-not-ready
                 title: PodNotReady
                 condition: A
+                noDataState: OK
                 for: 10m
                 labels:
                   severity: warning
@@ -137,6 +142,7 @@ kube-prometheus-stack:
               - uid: pv-filling-up
                 title: PersistentVolumeFillingUp
                 condition: A
+                noDataState: OK
                 for: 5m
                 labels:
                   severity: warning
