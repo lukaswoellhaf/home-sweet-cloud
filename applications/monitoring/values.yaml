@@ -124,6 +124,7 @@ kube-prometheus-stack:
         access: proxy
         jsonData:
           implementation: prometheus
+          handleGrafanaManagedAlerts: false
 
   prometheus-node-exporter:
     resources:
