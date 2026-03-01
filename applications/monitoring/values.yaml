@@ -51,6 +51,10 @@ kube-prometheus-stack:
     persistence:
       enabled: true
       size: 2Gi
+    securityContext:
+      runAsUser: 472
+      runAsGroup: 472
+      fsGroup: 472
     grafana.ini:
       server:
         root_url: https://grafana.lukaswoellhaf.com
