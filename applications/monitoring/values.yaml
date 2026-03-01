@@ -85,12 +85,6 @@ kube-prometheus-stack:
     env:
       DISCORD_WEBHOOK_URL: ""
     additionalDataSources:
-      - name: Prometheus
-        type: prometheus
-        uid: prometheus
-        url: http://monitoring-kube-prometheus-prometheus:9090
-        access: proxy
-        isDefault: true
       - name: Loki
         type: loki
         uid: loki
