@@ -12,11 +12,6 @@ kube-prometheus-stack:
                 type: discord
                 settings:
                   url: $DISCORD_WEBHOOK_URL
-                  message: |
-                    {{ len .Alerts.Firing }} alert(s) firing, {{ len .Alerts.Resolved }} resolved.
-                    {{ range .Alerts }}**[{{ .Labels.severity | toUpper }}] {{ .Labels.alertname }}**
-                    {{ .Annotations.summary }}
-                    {{ end }}
                 disableResolveMessage: false
       notification-policy.yaml:
         apiVersion: 1
@@ -27,8 +22,6 @@ kube-prometheus-stack:
             group_wait: 30s
             group_interval: 5m
             repeat_interval: 12h
-            matchers:
-              - alertname !~ "InfoInhibitor"
       rules.yaml:
         apiVersion: 1
         groups:
@@ -49,6 +42,9 @@ kube-prometheus-stack:
                 data:
                   - refId: A
                     datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
                     model:
                       expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.90
                       instant: true
@@ -65,6 +61,9 @@ kube-prometheus-stack:
                 data:
                   - refId: A
                     datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
                     model:
                       expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 90
                       instant: true
@@ -81,6 +80,9 @@ kube-prometheus-stack:
                 data:
                   - refId: A
                     datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
                     model:
                       expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.15
                       instant: true
@@ -102,6 +104,9 @@ kube-prometheus-stack:
                 data:
                   - refId: A
                     datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
                     model:
                       expr: kube_pod_container_status_waiting_reason{reason="CrashLoopBackOff"} > 0
                       instant: true
@@ -118,6 +123,9 @@ kube-prometheus-stack:
                 data:
                   - refId: A
                     datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
                     model:
                       expr: kube_pod_status_ready{condition="true"} == 0
                       instant: true
@@ -134,6 +142,9 @@ kube-prometheus-stack:
                 data:
                   - refId: A
                     datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
                     model:
                       expr: (kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes) < 0.15
                       instant: true
