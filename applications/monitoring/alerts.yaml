@@ -12,6 +12,11 @@ kube-prometheus-stack:
                 type: discord
                 settings:
                   url: $DISCORD_WEBHOOK_URL
+                  message: |
+                    {{ len .Alerts.Firing }} alert(s) firing, {{ len .Alerts.Resolved }} resolved.
+                    {{ range .Alerts }}**[{{ .Labels.severity | toUpper }}] {{ .Labels.alertname }}**
+                    {{ .Annotations.summary }}
+                    {{ end }}
                 disableResolveMessage: false
       notification-policy.yaml:
         apiVersion: 1
