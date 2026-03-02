@@ -185,7 +185,7 @@ kube-prometheus-stack:
                 condition: A
                 noDataState: OK
                 execErrState: OK
-                for: 10m
+                for: 5m
                 labels:
                   severity: warning
                 annotations:
