@@ -36,7 +36,7 @@ kube-prometheus-stack:
             rules:
               - uid: node-high-memory-usage
                 title: NodeHighMemoryUsage
-                condition: B
+                condition: C
                 noDataState: OK
                 execErrState: OK
                 for: 5m
@@ -61,9 +61,18 @@ kube-prometheus-stack:
                   - refId: B
                     datasourceUid: "__expr__"
                     model:
-                      type: threshold
+                      type: reduce
                       refId: B
                       expression: A
+                      reducer: last
+                      settings:
+                        mode: dropNN
+                  - refId: C
+                    datasourceUid: "__expr__"
+                    model:
+                      type: threshold
+                      refId: C
+                      expression: B
                       conditions:
                         - evaluator:
                             type: gt
@@ -71,12 +80,12 @@ kube-prometheus-stack:
                           operator:
                             type: and
                           query:
-                            params: [A]
+                            params: [B]
                           reducer:
                             type: last
               - uid: node-high-cpu-usage
                 title: NodeHighCPUUsage
-                condition: B
+                condition: C
                 noDataState: OK
                 execErrState: OK
                 for: 5m
@@ -101,9 +110,18 @@ kube-prometheus-stack:
                   - refId: B
                     datasourceUid: "__expr__"
                     model:
-                      type: threshold
+                      type: reduce
                       refId: B
                       expression: A
+                      reducer: last
+                      settings:
+                        mode: dropNN
+                  - refId: C
+                    datasourceUid: "__expr__"
+                    model:
+                      type: threshold
+                      refId: C
+                      expression: B
                       conditions:
                         - evaluator:
                             type: gt
@@ -111,12 +129,12 @@ kube-prometheus-stack:
                           operator:
                             type: and
                           query:
-                            params: [A]
+                            params: [B]
                           reducer:
                             type: last
               - uid: node-disk-space-low
                 title: NodeDiskSpaceLow
-                condition: B
+                condition: C
                 noDataState: OK
                 execErrState: OK
                 for: 5m
@@ -141,9 +159,18 @@ kube-prometheus-stack:
                   - refId: B
                     datasourceUid: "__expr__"
                     model:
-                      type: threshold
+                      type: reduce
                       refId: B
                       expression: A
+                      reducer: last
+                      settings:
+                        mode: dropNN
+                  - refId: C
+                    datasourceUid: "__expr__"
+                    model:
+                      type: threshold
+                      refId: C
+                      expression: B
                       conditions:
                         - evaluator:
                             type: lt
@@ -151,7 +178,7 @@ kube-prometheus-stack:
                           operator:
                             type: and
                           query:
-                            params: [A]
+                            params: [B]
                           reducer:
                             type: last
           - orgId: 1
@@ -182,7 +209,7 @@ kube-prometheus-stack:
                       refId: A
               - uid: pod-not-ready
                 title: PodNotReady
-                condition: B
+                condition: C
                 noDataState: OK
                 execErrState: OK
                 for: 5m
@@ -207,9 +234,18 @@ kube-prometheus-stack:
                   - refId: B
                     datasourceUid: "__expr__"
                     model:
-                      type: threshold
+                      type: reduce
                       refId: B
                       expression: A
+                      reducer: last
+                      settings:
+                        mode: dropNN
+                  - refId: C
+                    datasourceUid: "__expr__"
+                    model:
+                      type: threshold
+                      refId: C
+                      expression: B
                       conditions:
                         - evaluator:
                             type: lt
@@ -217,13 +253,14 @@ kube-prometheus-stack:
                           operator:
                             type: and
                           query:
-                            params: [A]
+                            params: [B]
                           reducer:
                             type: last
               - uid: pv-filling-up
                 title: PersistentVolumeFillingUp
-                condition: A
+                condition: C
                 noDataState: OK
+                execErrState: OK
                 for: 5m
                 labels:
                   severity: warning
@@ -237,6 +274,34 @@ kube-prometheus-stack:
                       from: 600
                       to: 0
                     model:
-                      expr: (kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes) < 0.15
-                      instant: true
+                      expr: kubelet_volume_stats_available_bytes / kubelet_volume_stats_capacity_bytes
+                      instant: false
+                      range: true
+                      intervalMs: 1000
+                      maxDataPoints: 43200
                       refId: A
+                  - refId: B
+                    datasourceUid: "__expr__"
+                    model:
+                      type: reduce
+                      refId: B
+                      expression: A
+                      reducer: last
+                      settings:
+                        mode: dropNN
+                  - refId: C
+                    datasourceUid: "__expr__"
+                    model:
+                      type: threshold
+                      refId: C
+                      expression: B
+                      conditions:
+                        - evaluator:
+                            type: lt
+                            params: [0.15]
+                          operator:
+                            type: and
+                          query:
+                            params: [B]
+                          reducer:
+                            type: last
