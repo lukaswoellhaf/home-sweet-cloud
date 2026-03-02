@@ -43,14 +43,35 @@ kube-prometheus-stack:
   grafana:
     resources:
       requests:
-        cpu: 20m
-        memory: 64Mi
+        cpu: 50m
+        memory: 128Mi
       limits:
-        cpu: 100m
-        memory: 256Mi
+        cpu: 200m
+        memory: 512Mi
+    readinessProbe:
+      httpGet:
+        path: /api/health
+        port: 3000
+      initialDelaySeconds: 60
+      timeoutSeconds: 30
+      periodSeconds: 30
+      failureThreshold: 5
     persistence:
       enabled: true
       size: 2Gi
+    securityContext:
+      fsGroup: 472
+    initChownData:
+      securityContext:
+        runAsNonRoot: false
+        runAsUser: 0
+        readOnlyRootFilesystem: true
+        capabilities:
+          add:
+            - CHOWN
+            - DAC_READ_SEARCH
+          drop:
+            - ALL
     grafana.ini:
       server:
         root_url: https://grafana.lukaswoellhaf.com
@@ -80,6 +101,13 @@ kube-prometheus-stack:
     # Alerting rules, contact points, and notification policy are in alerts.yaml
     env:
       DISCORD_WEBHOOK_URL: ""
+    additionalDataSources:
+      - name: Loki
+        type: loki
+        uid: loki
+        url: http://monitoring-loki:3100
+        access: proxy
+        isDefault: false
 
   prometheus-node-exporter:
     resources:
