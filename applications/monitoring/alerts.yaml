@@ -182,7 +182,7 @@ kube-prometheus-stack:
                       refId: A
               - uid: pod-not-ready
                 title: PodNotReady
-                condition: A
+                condition: B
                 noDataState: OK
                 execErrState: OK
                 for: 5m
@@ -190,7 +190,7 @@ kube-prometheus-stack:
                   severity: warning
                 annotations:
                   summary: "Pod not ready"
-                  description: "A pod has been not ready for more than 10 minutes."
+                  description: "A pod has been not ready for more than 5 minutes."
                 data:
                   - refId: A
                     datasourceUid: prometheus
@@ -198,9 +198,28 @@ kube-prometheus-stack:
                       from: 600
                       to: 0
                     model:
-                      expr: kube_pod_status_ready{condition="true",namespace!~"kube-system|monitoring"} == 0
-                      instant: true
+                      expr: kube_pod_status_ready{condition="true",namespace!~"kube-system|monitoring"}
+                      instant: false
+                      range: true
+                      intervalMs: 1000
+                      maxDataPoints: 43200
                       refId: A
+                  - refId: B
+                    datasourceUid: "__expr__"
+                    model:
+                      type: threshold
+                      refId: B
+                      expression: A
+                      conditions:
+                        - evaluator:
+                            type: lt
+                            params: [1]
+                          operator:
+                            type: and
+                          query:
+                            params: [A]
+                          reducer:
+                            type: last
               - uid: pv-filling-up
                 title: PersistentVolumeFillingUp
                 condition: A
