@@ -23,10 +23,11 @@ open-webui:
   # Will be overridden in workflow with actual secret
   openaiApiKey: ""
 
-  extraEnvVars:
-    # Disable self-registration
-    - name: ENABLE_SIGNUP
-      value: "false"
+  extraEnvVars: []
+  # Uncomment after creating your admin account to block further registrations:
+  # extraEnvVars:
+  #   - name: ENABLE_SIGNUP
+  #     value: "false"
 
   ingress:
     enabled: true
@@ -34,7 +35,6 @@ open-webui:
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
       traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
-      traefik.ingress.kubernetes.io/router.entrypoints: websecure
     host: chat.lukaswoellhaf.com
     tls: true
     existingSecret: chat-lukaswoellhaf-com-tls
