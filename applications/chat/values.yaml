@@ -23,11 +23,10 @@ open-webui:
   # Will be overridden in workflow with actual secret
   openaiApiKey: ""
 
-  extraEnvVars: []
-  # Uncomment after creating your admin account to block further registrations:
-  # extraEnvVars:
-  #   - name: ENABLE_SIGNUP
-  #     value: "false"
+  # Disable signup
+  extraEnvVars:
+    - name: ENABLE_SIGNUP
+      value: "false"
 
   ingress:
     enabled: true
