@@ -1,0 +1,51 @@
+namespace:
+  name: chat
+  create: true
+
+open-webui:
+  namespaceOverride: chat
+
+  replicaCount: 1
+
+  # Disable Ollama (local model runner)
+  ollama:
+    enabled: false
+  ollamaUrls: []
+
+  # Disable Pipelines — not needed since we're using Mistral AI API directly
+  # with no custom pipeline functions or filters required
+  pipelines:
+    enabled: false
+
+  # Mistral AI as the OpenAI-compatible backend
+  enableOpenaiApi: true
+  openaiBaseApiUrl: "https://api.mistral.ai/v1"
+  # Will be overridden in workflow with actual secret
+  openaiApiKey: ""
+
+  # Disable signup
+  extraEnvVars:
+    - name: ENABLE_SIGNUP
+      value: "false"
+
+  ingress:
+    enabled: true
+    class: traefik
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
+    host: chat.lukaswoellhaf.com
+    tls: true
+    existingSecret: chat-lukaswoellhaf-com-tls
+
+  persistence:
+    enabled: true
+    size: 5Gi
+    accessModes:
+      - ReadWriteOnce
+
+  websocket:
+    enabled: true
+    manager: redis
+    redis:
+      enabled: true
