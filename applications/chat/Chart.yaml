@@ -15,5 +15,5 @@ maintainers:
 
 dependencies:
   - name: open-webui
-    version: "12.8.1"
+    version: "14.8.0"
     repository: https://helm.openwebui.com
