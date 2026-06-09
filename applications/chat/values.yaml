@@ -16,6 +16,9 @@ open-webui:
     enabled: false
   ollamaUrls: []
 
+  # Disable OpenAI API (using Anthropic instead)
+  enableOpenaiApi: false
+
   # Disable Pipelines
   pipelines:
     enabled: false
