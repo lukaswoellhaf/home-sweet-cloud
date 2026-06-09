@@ -248,7 +248,8 @@ jobs:
           helm upgrade --install chat ./applications/chat \
             --namespace chat \
             --create-namespace \
-            --set apiKeys.anthropicApiKey=${{ secrets.ANTHROPIC_API_KEY }} \
+            --set apiKeys.openaiApiKey=${{ secrets.OPENAI_API_KEY }} \
+            --set apiKeys.mistralApiKey=${{ secrets.MISTRAL_API_KEY }} \
             --wait \
             --timeout 5m
           echo "Chat deployed successfully" >> $GITHUB_STEP_SUMMARY
