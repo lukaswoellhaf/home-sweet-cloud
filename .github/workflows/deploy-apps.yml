@@ -249,6 +249,7 @@ jobs:
             --namespace chat \
             --create-namespace \
             --set open-webui.openaiApiKey=${{ secrets.MISTRAL_API_KEY }} \
+            --set "open-webui.extraEnvVars[1].value=${{ secrets.ANTHROPIC_API_KEY }}" \
             --wait \
             --timeout 5m
           echo "Chat deployed successfully" >> $GITHUB_STEP_SUMMARY
