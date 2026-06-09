@@ -248,7 +248,6 @@ jobs:
           helm upgrade --install chat ./applications/chat \
             --namespace chat \
             --create-namespace \
-            --set apiKeys.mistralApiKey=${{ secrets.MISTRAL_API_KEY }} \
             --set apiKeys.anthropicApiKey=${{ secrets.ANTHROPIC_API_KEY }} \
             --wait \
             --timeout 5m

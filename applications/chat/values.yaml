@@ -4,7 +4,6 @@ namespace:
 
 apiKeys:
   # Will be overridden in workflow with actual secrets
-  mistralApiKey: ""
   anthropicApiKey: ""
 
 open-webui:
@@ -17,14 +16,9 @@ open-webui:
     enabled: false
   ollamaUrls: []
 
-  # Disable Pipelines — not needed since we're using Mistral AI API directly
-  # with no custom pipeline functions or filters required
+  # Disable Pipelines
   pipelines:
     enabled: false
-
-  # Mistral AI as the OpenAI-compatible backend
-  enableOpenaiApi: true
-  openaiBaseApiUrl: "https://api.mistral.ai/v1"
 
   # Disable signup
   extraEnvVars:
