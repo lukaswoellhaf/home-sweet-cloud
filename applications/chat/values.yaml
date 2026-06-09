@@ -2,6 +2,11 @@ namespace:
   name: chat
   create: true
 
+apiKeys:
+  # Will be overridden in workflow with actual secrets
+  mistralApiKey: ""
+  anthropicApiKey: ""
+
 open-webui:
   namespaceOverride: chat
 
@@ -20,16 +25,15 @@ open-webui:
   # Mistral AI as the OpenAI-compatible backend
   enableOpenaiApi: true
   openaiBaseApiUrl: "https://api.mistral.ai/v1"
-  # Will be overridden in workflow with actual secret
-  openaiApiKey: ""
 
   # Disable signup
   extraEnvVars:
     - name: ENABLE_SIGNUP
       value: "false"
-    - name: ANTHROPIC_API_KEY
-      # Will be overridden in workflow with actual secret
-      value: ""
+
+  extraEnvFrom:
+    - secretRef:
+        name: ai-models-api-keys
 
   ingress:
     enabled: true
