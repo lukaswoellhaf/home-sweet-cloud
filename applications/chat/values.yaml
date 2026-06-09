@@ -30,6 +30,9 @@ open-webui:
   extraEnvVars:
     - name: ENABLE_SIGNUP
       value: "false"
+    - name: ANTHROPIC_API_KEY
+      # Will be overridden in workflow with actual secret
+      value: ""
 
   extraEnvFrom:
     - secretRef:
