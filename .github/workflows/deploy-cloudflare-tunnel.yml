@@ -38,9 +38,14 @@ jobs:
         run: |
           ssh-keyscan -H ${SERVER_IP} >> ~/.ssh/known_hosts
 
-      - name: Install or update cloudflared on server
+      - name: Ensure cloudflared is installed on server
         run: |
           ssh root@${SERVER_IP} "set -euo pipefail
+          if command -v cloudflared >/dev/null 2>&1; then
+            cloudflared --version
+            exit 0
+          fi
+
           cd /tmp
           curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb -o cloudflared.deb
           dpkg -i cloudflared.deb || (apt-get update && apt-get install -f -y)
