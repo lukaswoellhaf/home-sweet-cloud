@@ -1,0 +1,102 @@
+name: Deploy Cloudflare Tunnel
+
+on:
+  workflow_dispatch:
+    inputs:
+      testDomainRoute:
+        description: 'Configure test DNS route (e.g., test.lukaswoellhaf.com, leave empty to skip)'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  deploy:
+    name: Deploy cloudflare-tunnel configuration
+    runs-on: ubuntu-latest
+    env:
+      TUNNEL_UUID: ${{ secrets.CLOUDFLARED_TUNNEL_UUID }}
+      TUNNEL_CREDENTIALS_JSON: ${{ secrets.CLOUDFLARED_TUNNEL_CREDENTIALS_JSON }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Configure SSH key
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v4
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          version: latest
+
+      - name: Add server to known_hosts
+        run: |
+          ssh-keyscan -H ${{ vars.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Install or update cloudflared on server
+        run: |
+          ssh root@${{ vars.SERVER_IP }} "set -euo pipefail
+          cd /tmp
+          curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb -o cloudflared.deb
+          dpkg -i cloudflared.deb || (apt-get update && apt-get install -f -y)
+          dpkg -i cloudflared.deb
+          rm -f cloudflared.deb"
+
+      - name: Prepare credentials and rendered config
+        run: |
+          set -euo pipefail
+          if [[ -z "${TUNNEL_UUID}" ]]; then
+            echo "CLOUDFLARED_TUNNEL_UUID secret is missing"
+            exit 1
+          fi
+
+          if [[ -z "${TUNNEL_CREDENTIALS_JSON}" ]]; then
+            echo "CLOUDFLARED_TUNNEL_CREDENTIALS_JSON secret is missing"
+            exit 1
+          fi
+
+          printf '%s' "${TUNNEL_CREDENTIALS_JSON}" > /tmp/cloudflared-credentials.json
+          sed "s|{{TUNNEL_UUID}}|${TUNNEL_UUID}|g" infrastructure/cloudflare-tunnel/config.yml > /tmp/cloudflared-config.yml
+
+      - name: Upload credentials and config to server
+        run: |
+          set -euo pipefail
+          scp /tmp/cloudflared-credentials.json root@${{ vars.SERVER_IP }}:/tmp/cloudflared-credentials.json
+          scp /tmp/cloudflared-config.yml root@${{ vars.SERVER_IP }}:/tmp/cloudflared-config.yml
+
+          ssh root@${{ vars.SERVER_IP }} "set -euo pipefail
+          mkdir -p /root/.cloudflared
+          install -m 600 /tmp/cloudflared-credentials.json /root/.cloudflared/${TUNNEL_UUID}.json
+          mkdir -p /etc/cloudflared
+          install -m 644 /tmp/cloudflared-config.yml /etc/cloudflared/config.yml
+          rm -f /tmp/cloudflared-credentials.json /tmp/cloudflared-config.yml"
+
+      - name: Optionally configure test DNS route
+        if: ${{ github.event.inputs.testDomainRoute != '' }}
+        run: |
+          ssh root@${{ vars.SERVER_IP }} "cloudflared tunnel route dns homesweetcloud ${{ github.event.inputs.testDomainRoute }}"
+
+      - name: Enable and restart cloudflared service
+        run: |
+          ssh root@${{ vars.SERVER_IP }} "set -euo pipefail
+          cloudflared service install || true
+          systemctl daemon-reload
+          systemctl enable --now cloudflared
+          systemctl restart cloudflared"
+
+      - name: Verify tunnel service health
+        run: |
+          ssh root@${{ vars.SERVER_IP }} "set -euo pipefail
+          systemctl is-active cloudflared
+          systemctl --no-pager --full status cloudflared | head -n 40"
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "## Cloudflare Tunnel Deployment Complete" >> $GITHUB_STEP_SUMMARY
+          echo "- Config source: infrastructure/cloudflare-tunnel/config.yml" >> $GITHUB_STEP_SUMMARY
+          echo "- Server config: /etc/cloudflared/config.yml" >> $GITHUB_STEP_SUMMARY
+          echo "- Service: cloudflared (enabled and running)" >> $GITHUB_STEP_SUMMARY

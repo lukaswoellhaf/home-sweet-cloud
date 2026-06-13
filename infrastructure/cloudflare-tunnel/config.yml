@@ -1,0 +1,20 @@
+# Cloudflare Tunnel Configuration
+
+# Tunnel UUID is rendered during workflow deployment from GitHub secret CLOUDFLARED_TUNNEL_UUID
+tunnel: homesweetcloud
+credentials-file: /root/.cloudflared/{{TUNNEL_UUID}}.json
+
+# Run the tunnel service with debug logging if needed
+# loglevel: debug
+
+# Ingress routes
+ingress:
+  # - hostname: lukaswoellhaf.com
+  #   service: http://localhost:8080
+  # - hostname: code.lukaswoellhaf.com
+  #   service: http://localhost:8081
+  # - hostname: grafana.lukaswoellhaf.com
+  #   service: http://localhost:8082
+  
+  # Catch-all: no other routes match
+  - service: http_status:404
