@@ -1,0 +1,33 @@
+name: Deploy Cloudflare Tunnel
+
+on:
+  workflow_dispatch:
+    inputs:
+      testDomainRoute:
+        description: "Optional test DNS route to configure later (e.g. test.lukaswoellhaf.com)"
+        required: false
+        default: ""
+        type: string
+
+jobs:
+  placeholder:
+    name: Placeholder cloudflare-tunnel deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Placeholder run
+        run: |
+          echo "This is a placeholder workflow for Cloudflare Tunnel deployment."
+          echo "It exists so you can trigger and verify the workflow wiring on main."
+          if [[ -n "${{ github.event.inputs.testDomainRoute }}" ]]; then
+            echo "Requested test route: ${{ github.event.inputs.testDomainRoute }}"
+          else
+            echo "No test route was provided."
+          fi
+
+      - name: Summary
+        if: success()
+        run: |
+          echo "## Placeholder: Cloudflare Tunnel" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: Workflow trigger wiring is working." >> $GITHUB_STEP_SUMMARY
+          echo "- Next: Replace placeholder steps with real deploy logic." >> $GITHUB_STEP_SUMMARY
