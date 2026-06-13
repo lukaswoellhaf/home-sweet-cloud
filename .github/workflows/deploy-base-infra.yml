@@ -17,6 +17,12 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
       
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v4
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          version: latest
+      
       - name: Add server to known_hosts
         run: |
           ssh-keyscan -H ${{ vars.SERVER_IP }} >> ~/.ssh/known_hosts
