@@ -15,6 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SERVER_IP: ${{ vars.SERVER_IP }}
+      SSH_USER: ${{ secrets.SSH_USER }}
       TUNNEL_UUID: ${{ secrets.CLOUDFLARED_TUNNEL_UUID }}
       TUNNEL_CREDENTIALS_JSON: ${{ secrets.CLOUDFLARED_TUNNEL_CREDENTIALS_JSON }}
 
@@ -37,17 +38,13 @@ jobs:
         run: |
           ssh-keyscan -H ${SERVER_IP} >> ~/.ssh/known_hosts
 
-      - name: Test SSH connectivity
-        run: |
-          ssh -o BatchMode=yes -o ConnectTimeout=10 root@${SERVER_IP} "echo SSH connection successful"
-
       - name: Install or update cloudflared on server
         run: |
-          ssh root@${SERVER_IP} "set -euo pipefail
+          ssh ${SSH_USER}@${SERVER_IP} "set -euo pipefail
           cd /tmp
           curl -fsSL https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb -o cloudflared.deb
-          dpkg -i cloudflared.deb || (apt-get update && apt-get install -f -y)
-          dpkg -i cloudflared.deb
+          sudo dpkg -i cloudflared.deb || (sudo apt-get update && sudo apt-get install -f -y)
+          sudo dpkg -i cloudflared.deb
           rm -f cloudflared.deb"
 
       - name: Prepare credentials and rendered config
@@ -69,34 +66,34 @@ jobs:
       - name: Upload credentials and config to server
         run: |
           set -euo pipefail
-          scp /tmp/cloudflared-credentials.json root@${SERVER_IP}:/tmp/cloudflared-credentials.json
-          scp /tmp/cloudflared-config.yml root@${SERVER_IP}:/tmp/cloudflared-config.yml
+          scp /tmp/cloudflared-credentials.json ${SSH_USER}@${SERVER_IP}:/tmp/cloudflared-credentials.json
+          scp /tmp/cloudflared-config.yml ${SSH_USER}@${SERVER_IP}:/tmp/cloudflared-config.yml
 
-          ssh root@${SERVER_IP} "set -euo pipefail
-          mkdir -p /root/.cloudflared
-          install -m 600 /tmp/cloudflared-credentials.json /root/.cloudflared/${TUNNEL_UUID}.json
-          mkdir -p /etc/cloudflared
-          install -m 644 /tmp/cloudflared-config.yml /etc/cloudflared/config.yml
+          ssh ${SSH_USER}@${SERVER_IP} "set -euo pipefail
+          sudo mkdir -p /root/.cloudflared
+          sudo install -m 600 /tmp/cloudflared-credentials.json /root/.cloudflared/${TUNNEL_UUID}.json
+          sudo mkdir -p /etc/cloudflared
+          sudo install -m 644 /tmp/cloudflared-config.yml /etc/cloudflared/config.yml
           rm -f /tmp/cloudflared-credentials.json /tmp/cloudflared-config.yml"
 
       - name: Optionally configure test DNS route
         if: ${{ github.event.inputs.testDomainRoute != '' }}
         run: |
-          ssh root@${SERVER_IP} "cloudflared tunnel route dns homesweetcloud ${{ github.event.inputs.testDomainRoute }}"
+          ssh ${SSH_USER}@${SERVER_IP} "sudo cloudflared tunnel route dns homesweetcloud ${{ github.event.inputs.testDomainRoute }}"
 
       - name: Enable and restart cloudflared service
         run: |
-          ssh root@${SERVER_IP} "set -euo pipefail
-          cloudflared service install || true
-          systemctl daemon-reload
-          systemctl enable --now cloudflared
-          systemctl restart cloudflared"
+          ssh ${SSH_USER}@${SERVER_IP} "set -euo pipefail
+          sudo cloudflared service install || true
+          sudo systemctl daemon-reload
+          sudo systemctl enable --now cloudflared
+          sudo systemctl restart cloudflared"
 
       - name: Verify tunnel service health
         run: |
-          ssh root@${SERVER_IP} "set -euo pipefail
-          systemctl is-active cloudflared
-          systemctl --no-pager --full status cloudflared | head -n 40"
+          ssh ${SSH_USER}@${SERVER_IP} "set -euo pipefail
+          sudo systemctl is-active cloudflared
+          sudo systemctl --no-pager --full status cloudflared | head -n 40"
 
       - name: Summary
         if: success()
