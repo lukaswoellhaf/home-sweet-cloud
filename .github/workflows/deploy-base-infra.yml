@@ -23,6 +23,11 @@ jobs:
         with:
           authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
           version: latest
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v5
+        with:
+          version: 'latest'
       
       - name: Add server to known_hosts
         run: |

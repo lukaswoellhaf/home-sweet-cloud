@@ -9,6 +9,10 @@ credentials-file: /root/.cloudflared/{{TUNNEL_UUID}}.json
 
 # Ingress routes
 ingress:
+  # Temporary smoke test routed through Traefik on the k3s node.
+  - hostname: test.lukaswoellhaf.com
+    service: http://localhost:80
+
   # - hostname: lukaswoellhaf.com
   #   service: http://localhost:8080
   # - hostname: code.lukaswoellhaf.com

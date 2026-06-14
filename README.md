@@ -74,8 +74,9 @@ Grafana's native alerting sends `warning` and `critical` alerts to Discord via a
 All cluster configurations and deployments are automated via GitHub Actions pipelines:
 
 1. **Install k3s**: Run `install-k3s` workflow to bootstrap the cluster using k3sup
-2. **Deploy Infrastructure**: Run `deploy-base-infra` workflow to install cert-manager and base infrastructure
-3. **Deploy Applications**: Run `deploy-apps` workflow to deploy individual applications
+2. **Deploy Cloudflare Tunnel Config**: Re-run `deploy-cloudflare-tunnel` whenever `infrastructure/cloudflare-tunnel/config.yml` changes
+3. **Deploy Infrastructure**: Run `deploy-base-infra` workflow to install cert-manager and base infrastructure
+4. **Deploy Applications**: Run `deploy-apps` workflow to deploy individual applications
 
 Required GitHub secrets: `SSH_PRIVATE_KEY`, `PAT_SECRET_MANAGER` (for automatic secret management), `GRAFANA_ADMIN_USERNAME`, `GRAFANA_ADMIN_PASSWORD`, `DISCORD_WEBHOOK_URL`, and application-specific secrets.
 
