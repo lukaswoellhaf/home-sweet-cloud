@@ -36,28 +36,3 @@ headlamp:
 
   persistentVolumeClaim:
     enabled: false
-
-smokeTest:
-  enabled: true
-  namespace: smoke-test
-  host: test.lukaswoellhaf.com
-  tlsSecretName: test-lukaswoellhaf-com-tls
-
-  image:
-    repository: hashicorp/http-echo
-    tag: "1.0.0"
-    pullPolicy: IfNotPresent
-
-  service:
-    port: 80
-    targetPort: 5678
-
-  responseText: "home-sweet-cloud smoke test"
-
-  resources:
-    requests:
-      cpu: 10m
-      memory: 16Mi
-    limits:
-      cpu: 50m
-      memory: 32Mi
