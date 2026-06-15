@@ -2,12 +2,6 @@ name: Deploy Cloudflare Tunnel
 
 on:
   workflow_dispatch:
-    inputs:
-      testDomainRoute:
-        description: 'Configure test DNS route (e.g., test.lukaswoellhaf.com, leave empty to skip)'
-        required: false
-        default: ''
-        type: string
 
 jobs:
   deploy:
@@ -80,11 +74,6 @@ jobs:
           mkdir -p /etc/cloudflared
           install -m 644 /tmp/cloudflared-config.yml /etc/cloudflared/config.yml
           rm -f /tmp/cloudflared-credentials.json /tmp/cloudflared-config.yml"
-
-      - name: Optionally configure test DNS route
-        if: ${{ github.event.inputs.testDomainRoute != '' }}
-        run: |
-          ssh root@${SERVER_IP} "cloudflared tunnel route dns homesweetcloud ${{ github.event.inputs.testDomainRoute }}"
 
       - name: Enable and restart cloudflared service
         run: |

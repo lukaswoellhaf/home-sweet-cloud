@@ -39,7 +39,6 @@ open-webui:
     class: traefik
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
-      traefik.ingress.kubernetes.io/router.middlewares: default-https-redirect@kubernetescrd
     host: chat.lukaswoellhaf.com
     tls: true
     existingSecret: chat-lukaswoellhaf-com-tls
