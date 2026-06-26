@@ -5,6 +5,6 @@ metadata:
   namespace: {{ .Values.namespace.name }}
 spec:
   redirectRegex:
-    regex: "^https://([^/]+)/?$"
+    regex: "^https?://([^/]+)/?$"
     replacement: "https://${1}/public/snippets"
     permanent: false
