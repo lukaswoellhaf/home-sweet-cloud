@@ -48,7 +48,7 @@ Verify: `ip -4 addr show enp3s0` should show a LAN IP.
 
 ### 4.1 Copy your public key
 ```bash
-ssh-copy-id <user>@<server-ip>
+ssh-copy-id <server-user>@<server-ip>
 ```
 
 ### 4.2 Harden the main config
