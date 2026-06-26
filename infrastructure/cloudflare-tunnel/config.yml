@@ -11,11 +11,19 @@ credentials-file: /root/.cloudflared/{{TUNNEL_UUID}}.json
 ingress:
   - hostname: lukaswoellhaf.com
     service: http://localhost:80
+  - hostname: www.lukaswoellhaf.com
+    service: http://localhost:80
   - hostname: code.lukaswoellhaf.com
+    service: http://localhost:80
+  - hostname: www.code.lukaswoellhaf.com
     service: http://localhost:80
   - hostname: grafana.lukaswoellhaf.com
     service: http://localhost:80
+  - hostname: www.grafana.lukaswoellhaf.com
+    service: http://localhost:80
   - hostname: chat.lukaswoellhaf.com
+    service: http://localhost:80
+  - hostname: www.chat.lukaswoellhaf.com
     service: http://localhost:80
   
   # Catch-all: no other routes match

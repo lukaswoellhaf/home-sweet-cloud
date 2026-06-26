@@ -55,6 +55,9 @@ The infrastructure chart provides:
 | `grafana.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
 | `chat.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
 | `www.lukaswoellhaf.com` | CNAME | `lukaswoellhaf.com` |
+| `www.code.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
+| `www.grafana.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
+| `www.chat.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
 | `lukaswoellhaf.com` | MX | `mx1.improvmx.com` (10), `mx2.improvmx.com` (20) |
 | `lukaswoellhaf.com` | TXT | SPF (`v=spf1 include:spf.improvmx.com ~all`), Google Site Verification |
 
