@@ -4,8 +4,8 @@ Infrastructure as Code repository for creating and managing a personal Kubernete
 
 ## Tech Stack
 
-- **Hetzner Cloud** - VPS CPX22 (2 VCPU, 4 GB RAM, 80 GB STORAGE)
-- **k3s** - Lightweight Kubernetes distribution
+- **[ThinkPad E580](https://psref.lenovo.com/Product/ThinkPad/ThinkPad_E580)** — DIY home server (Intel Core i5-8250U, 8 GB DDR4, 256 GB NVMe SSD) running Ubuntu Server 24.04 LTS
+- **k3s** — Lightweight single-node Kubernetes distribution
 - **Helm** - Kubernetes package manager
 - **cert-manager** - Automated SSL/TLS certificate management
 - **Traefik** - Ingress controller
@@ -21,6 +21,7 @@ applications/       Application deployments
   monitoring/       Prometheus, Grafana, Loki
   bytestash/        Code snippet manager
   portfolio-website/ Personal website
+  chat/             Open WebUI
 ```
 
 ## Infrastructure
@@ -28,7 +29,7 @@ applications/       Application deployments
 The infrastructure chart provides:
 
 - Let's Encrypt SSL certificates via cert-manager
-- Traefik ingress controller with automatic HTTPS redirect
+- Traefik ingress controller (HTTPS enforced at Cloudflare edge)
 - Headlamp dashboard for cluster management
 - RBAC configuration with deployment service account
 
@@ -38,27 +39,23 @@ The infrastructure chart provides:
 
 [**Portfolio Website**](https://github.com/lukaswoellhaf/lukaswoellhafcom) - Personal portfolio website. Accesible at [lukaswoellhaf.com](https://lukaswoellhaf.com)
 
-## DNS Configuration
+[**Chat**](https://github.com/lukaswoellhaf/home-sweet-cloud) — Open WebUI — accessible at [chat.lukaswoellhaf.com](https://chat.lukaswoellhaf.com)
 
-Domains managed via Netcup.
-- `lukaswoellhaf.com` (domain)
-- `code.lukaswoellhaf.com` (subdomain)
-- `grafana.lukaswoellhaf.com` (subdomain)
+## DNS
 
-Required DNS records:
+**Registrar:** Netcup &nbsp;|&nbsp; **DNS management:** Cloudflare &nbsp;|&nbsp; **Public exposure:** Cloudflare Tunnel
 
-```
-@         A       <server-ip>           # Root domain IPv4
-@         AAAA    <server-ipv6>         # Root domain IPv6
-code      A       <server-ip>           # Subdomain IPv4
-code      AAAA    <server-ipv6>         # Subdomain IPv6
-grafana   A       <server-ip>           # Subdomain IPv4
-grafana   AAAA    <server-ipv6>         # Subdomain IPv6
-www       CNAME   @                     # Redirect www to root domain
-@         MX      10 <mx-server-1>      # Primary mail server
-@         MX      20 <mx-server-2>      # Secondary mail server
-@         TXT     <spf-record>          # SPF record for email authentication
-```
+| Record | Type | Value |
+|---|---|---|
+| `lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
+| `code.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
+| `grafana.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
+| `chat.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
+| `www.lukaswoellhaf.com` | CNAME | `lukaswoellhaf.com` |
+| `lukaswoellhaf.com` | MX | `mx1.improvmx.com` (10), `mx2.improvmx.com` (20) |
+| `lukaswoellhaf.com` | TXT | SPF (`v=spf1 include:spf.improvmx.com ~all`), Google Site Verification |
+
+Cloudflare edge enforces HTTPS. TLS certificates are provisioned by **cert-manager** via Let's Encrypt on the cluster.
 
 ## Monitoring
 
@@ -73,6 +70,7 @@ Grafana's native alerting sends `warning` and `critical` alerts to Discord via a
 
 All cluster configurations and deployments are automated via GitHub Actions pipelines:
 
+0. **Set up the server** — Follow [server-setup.md`](docs/server-setup.md) to configure the ThinkPad as a headless Ubuntu home server (BIOS, SSH hardening, firewall, lid-close behavior).
 1. **Install k3s**: Run `install-k3s` workflow to bootstrap the cluster using k3sup
 2. **Deploy Cloudflare Tunnel Config**: Re-run `deploy-cloudflare-tunnel` whenever `infrastructure/cloudflare-tunnel/config.yml` changes
 3. **Deploy Infrastructure**: Run `deploy-base-infra` workflow to install cert-manager and base infrastructure
@@ -102,8 +100,8 @@ pre-commit run --all-files
 Access the Headlamp dashboard via SSH tunnel and port-forward:
 
 ```bash
-# Create SSH tunnel to the server
-ssh -L 8080:localhost:8080 <user>@<server-ip>
+# SSH to server via Tailscale
+ssh lkswadmin@100.96.66.77 -L 8080:localhost:8080
 
 # In another terminal, port-forward to Headlamp service
 kubectl port-forward -n default svc/infrastructure-headlamp 8080:80
