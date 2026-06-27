@@ -319,8 +319,8 @@ kube-prometheus-stack:
                 labels:
                   severity: warning
                 annotations:
-                  summary: "[TEST] CPU temperature above 45°C"
-                  description: "[TEST] CPU package temperature is above 45°C. Thermal throttling may begin soon. Check airflow, dust, and fan operation."
+                  summary: "CPU temperature above 80°C"
+                  description: "CPU package temperature is above 80°C. Thermal throttling may begin soon. Check airflow, dust, and fan operation."
                 data:
                   - refId: A
                     datasourceUid: prometheus
@@ -352,7 +352,7 @@ kube-prometheus-stack:
                       conditions:
                         - evaluator:
                             type: gt
-                            params: [45]
+                            params: [80]
                           operator:
                             type: and
                           query:
@@ -368,8 +368,8 @@ kube-prometheus-stack:
                 labels:
                   severity: critical
                 annotations:
-                  summary: "[TEST] CPU temperature above 50°C — CRITICAL"
-                  description: "[TEST] CPU package temperature is above 50°C. Immediate thermal throttling likely. Shut down if sustained."
+                  summary: "CPU temperature above 90°C — CRITICAL"
+                  description: "CPU package temperature is above 90°C. Immediate thermal throttling likely. Shut down if sustained."
                 data:
                   - refId: A
                     datasourceUid: prometheus
@@ -401,7 +401,7 @@ kube-prometheus-stack:
                       conditions:
                         - evaluator:
                             type: gt
-                            params: [50]
+                            params: [90]
                           operator:
                             type: and
                           query:
