@@ -33,13 +33,13 @@ open-webui:
   extraEnvVars:
     - name: ENABLE_SIGNUP
       value: "false"
-    # Web search via DDGS metasearch engine (DuckDuckGo backend)
+    # Web search via DDGS metasearch engine
     - name: ENABLE_WEB_SEARCH
       value: "true"
     - name: WEB_SEARCH_ENGINE
       value: "ddgs"
     - name: DDGS_BACKEND
-      value: "duckduckgo"
+      value: "auto"
     - name: WEB_SEARCH_RESULT_COUNT
       value: "5"
     # Security & privacy hardening
