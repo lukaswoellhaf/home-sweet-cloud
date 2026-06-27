@@ -39,7 +39,7 @@ open-webui:
     - name: WEB_SEARCH_ENGINE
       value: "ddgs"
     - name: DDGS_BACKEND
-      value: "auto"
+      value: "bing"
     - name: WEB_SEARCH_RESULT_COUNT
       value: "5"
     # Security & privacy hardening
