@@ -108,6 +108,10 @@ kube-prometheus-stack:
         isDefault: false
 
   prometheus-node-exporter:
+    # Extra collectors needed by Node Exporter dashboard
+    extraArgs:
+      - --collector.systemd
+      - --collector.processes
     resources:
       requests:
         cpu: 10m
