@@ -328,7 +328,7 @@ kube-prometheus-stack:
                       from: 600
                       to: 0
                     model:
-                      expr: node_hwmon_temp_celsius{chip=~".*coretemp.*|.*cpu.*|.*k10temp.*|.*acpitz.*",sensor=~".*Package.*|.*CPU.*|.*temp1.*"}
+                      expr: max by(instance) (node_hwmon_temp_celsius{chip="platform_coretemp_0"})
                       instant: false
                       range: true
                       intervalMs: 1000
@@ -377,7 +377,7 @@ kube-prometheus-stack:
                       from: 600
                       to: 0
                     model:
-                      expr: node_hwmon_temp_celsius{chip=~".*coretemp.*|.*cpu.*|.*k10temp.*|.*acpitz.*",sensor=~".*Package.*|.*CPU.*|.*temp1.*"}
+                      expr: max by(instance) (node_hwmon_temp_celsius{chip="platform_coretemp_0"})
                       instant: false
                       range: true
                       intervalMs: 1000
