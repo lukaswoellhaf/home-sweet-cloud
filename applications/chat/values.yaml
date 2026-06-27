@@ -6,6 +6,7 @@ apiKeys:
   # Will be overridden in workflow with actual secrets
   openaiApiKey: ""
   mistralApiKey: ""
+  braveSearchApiKey: ""
 
 open-webui:
   namespaceOverride: chat
@@ -33,18 +34,20 @@ open-webui:
   extraEnvVars:
     - name: ENABLE_SIGNUP
       value: "false"
-    # Web search via DDGS metasearch engine
+    # Web search via Brave Search API (brave_llm_context)
     - name: ENABLE_WEB_SEARCH
       value: "true"
     - name: WEB_SEARCH_ENGINE
-      value: "ddgs"
-    - name: DDGS_BACKEND
-      value: "bing"
+      value: "brave_llm_context"
+    - name: BRAVE_SEARCH_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: web-search-api-keys
+          key: brave-search-api-key
+    - name: WEB_SEARCH_CONCURRENT_REQUESTS
+      value: "1"
     - name: WEB_SEARCH_RESULT_COUNT
-      value: "5"
-    # Real browser User-Agent to avoid bot-detection blocks on result page scraping
-    - name: USER_AGENT
-      value: "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36"
+      value: "3"
     # Security & privacy hardening
     - name: WEBUI_SESSION_COOKIE_SECURE
       value: "true"
