@@ -26,10 +26,10 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       
       - name: Checkout repository lukaswoellhafcom
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: lukaswoellhaf/lukaswoellhafcom
           path: lukaswoellhafcom
@@ -105,7 +105,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       
       - name: Set up kubectl
         uses: azure/setup-kubectl@v5
@@ -165,7 +165,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       
       - name: Set up kubectl
         uses: azure/setup-kubectl@v5
@@ -226,7 +226,7 @@ jobs:
     
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       
       - name: Set up kubectl
         uses: azure/setup-kubectl@v5
