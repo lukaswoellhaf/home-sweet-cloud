@@ -48,6 +48,11 @@ open-webui:
       value: "1"
     - name: WEB_SEARCH_RESULT_COUNT
       value: "3"
+    # Use OpenAI for embeddings
+    - name: RAG_EMBEDDING_ENGINE
+      value: "openai"
+    - name: RAG_EMBEDDING_MODEL
+      value: "text-embedding-3-small"
     # Security & privacy hardening
     - name: WEBUI_SESSION_COOKIE_SECURE
       value: "true"
