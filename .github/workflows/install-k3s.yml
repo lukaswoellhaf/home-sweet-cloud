@@ -2,6 +2,12 @@ name: Install k3s
 
 on:
   workflow_dispatch:
+    inputs:
+      k3s_version:
+        description: 'K3s version to install'
+        required: false
+        default: 'v1.36.1+k3s1'
+        type: string
 
 jobs:
   install-k3s:
@@ -21,7 +27,14 @@ jobs:
       - name: Configure SSH key
         uses: webfactory/ssh-agent@v0.10.0
         with:
+          log-public-key: false
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v4
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          version: latest
       
       - name: Add server to known_hosts
         run: |
@@ -41,7 +54,7 @@ jobs:
           k3sup install \
             --ip ${{ vars.SERVER_IP }} \
             --user root \
-            --k3s-version v1.35.1+k3s1 \
+            --k3s-version "${{ github.event.inputs.k3s_version }}" \
             --k3s-extra-args '--tls-san ${{ vars.SERVER_IP }} --tls-san ${{ vars.DOMAIN_NAME }}' \
             --local-path $HOME/.kube/config \
             --context home-sweet-cloud

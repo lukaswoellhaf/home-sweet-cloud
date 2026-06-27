@@ -15,7 +15,19 @@ jobs:
       - name: Configure SSH key
         uses: webfactory/ssh-agent@v0.10.0
         with:
+          log-public-key: false
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v4
+        with:
+          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          version: latest
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v5
+        with:
+          version: 'latest'
       
       - name: Add server to known_hosts
         run: |
