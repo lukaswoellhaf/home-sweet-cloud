@@ -305,3 +305,302 @@ kube-prometheus-stack:
                             params: [B]
                           reducer:
                             type: last
+          - orgId: 1
+            name: hardware.rules
+            folder: Infrastructure Alerts
+            interval: 1m
+            rules:
+              - uid: node-high-cpu-temperature-warning
+                title: NodeHighCPUTemperatureWarning
+                condition: C
+                noDataState: OK
+                execErrState: OK
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "CPU temperature above 80°C"
+                  description: "CPU package temperature is above 80°C. Thermal throttling may begin soon. Check airflow, dust, and fan operation."
+                data:
+                  - refId: A
+                    datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
+                    model:
+                      expr: max by(instance) (node_hwmon_temp_celsius{chip="platform_coretemp_0"})
+                      instant: false
+                      range: true
+                      intervalMs: 1000
+                      maxDataPoints: 43200
+                      refId: A
+                  - refId: B
+                    datasourceUid: "__expr__"
+                    model:
+                      type: reduce
+                      refId: B
+                      expression: A
+                      reducer: last
+                      settings:
+                        mode: dropNN
+                  - refId: C
+                    datasourceUid: "__expr__"
+                    model:
+                      type: threshold
+                      refId: C
+                      expression: B
+                      conditions:
+                        - evaluator:
+                            type: gt
+                            params: [80]
+                          operator:
+                            type: and
+                          query:
+                            params: [B]
+                          reducer:
+                            type: last
+              - uid: node-high-cpu-temperature-critical
+                title: NodeHighCPUTemperatureCritical
+                condition: C
+                noDataState: OK
+                execErrState: OK
+                for: 5m
+                labels:
+                  severity: critical
+                annotations:
+                  summary: "CPU temperature above 90°C — CRITICAL"
+                  description: "CPU package temperature is above 90°C. Immediate thermal throttling likely. Shut down if sustained."
+                data:
+                  - refId: A
+                    datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
+                    model:
+                      expr: max by(instance) (node_hwmon_temp_celsius{chip="platform_coretemp_0"})
+                      instant: false
+                      range: true
+                      intervalMs: 1000
+                      maxDataPoints: 43200
+                      refId: A
+                  - refId: B
+                    datasourceUid: "__expr__"
+                    model:
+                      type: reduce
+                      refId: B
+                      expression: A
+                      reducer: last
+                      settings:
+                        mode: dropNN
+                  - refId: C
+                    datasourceUid: "__expr__"
+                    model:
+                      type: threshold
+                      refId: C
+                      expression: B
+                      conditions:
+                        - evaluator:
+                            type: gt
+                            params: [90]
+                          operator:
+                            type: and
+                          query:
+                            params: [B]
+                          reducer:
+                            type: last
+              - uid: node-disk-io-saturation
+                title: NodeDiskIOSaturation
+                condition: C
+                noDataState: OK
+                execErrState: OK
+                for: 15m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Disk I/O saturation above 90%"
+                  description: "Disk I/O utilization has been above 90% for 15 minutes. Storage may be a bottleneck."
+                data:
+                  - refId: A
+                    datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
+                    model:
+                      expr: rate(node_disk_io_time_seconds_total[5m]) * 100
+                      instant: false
+                      range: true
+                      intervalMs: 1000
+                      maxDataPoints: 43200
+                      refId: A
+                  - refId: B
+                    datasourceUid: "__expr__"
+                    model:
+                      type: reduce
+                      refId: B
+                      expression: A
+                      reducer: last
+                      settings:
+                        mode: dropNN
+                  - refId: C
+                    datasourceUid: "__expr__"
+                    model:
+                      type: threshold
+                      refId: C
+                      expression: B
+                      conditions:
+                        - evaluator:
+                            type: gt
+                            params: [0.90]
+                          operator:
+                            type: and
+                          query:
+                            params: [B]
+                          reducer:
+                            type: last
+              - uid: node-network-errors
+                title: NodeNetworkErrors
+                condition: C
+                noDataState: OK
+                execErrState: OK
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Network errors detected"
+                  description: "Network interface is experiencing receive or transmit errors. Check cables, switch port, or NIC driver."
+                data:
+                  - refId: A
+                    datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
+                    model:
+                      expr: increase(node_network_receive_errs_total[5m]) + increase(node_network_transmit_errs_total[5m])
+                      instant: false
+                      range: true
+                      intervalMs: 1000
+                      maxDataPoints: 43200
+                      refId: A
+                  - refId: B
+                    datasourceUid: "__expr__"
+                    model:
+                      type: reduce
+                      refId: B
+                      expression: A
+                      reducer: last
+                      settings:
+                        mode: dropNN
+                  - refId: C
+                    datasourceUid: "__expr__"
+                    model:
+                      type: threshold
+                      refId: C
+                      expression: B
+                      conditions:
+                        - evaluator:
+                            type: gt
+                            params: [0]
+                          operator:
+                            type: and
+                          query:
+                            params: [B]
+                          reducer:
+                            type: last
+              - uid: node-high-load
+                title: NodeHighLoad
+                condition: C
+                noDataState: OK
+                execErrState: OK
+                for: 10m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "System load more than 2x CPU cores"
+                  description: "System load average exceeds 2x the number of CPU cores. Processes are backing up; the system may feel sluggish."
+                data:
+                  - refId: A
+                    datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
+                    model:
+                      expr: node_load1 / count without(cpu, mode) (node_cpu_seconds_total{mode="idle"})
+                      instant: false
+                      range: true
+                      intervalMs: 1000
+                      maxDataPoints: 43200
+                      refId: A
+                  - refId: B
+                    datasourceUid: "__expr__"
+                    model:
+                      type: reduce
+                      refId: B
+                      expression: A
+                      reducer: last
+                      settings:
+                        mode: dropNN
+                  - refId: C
+                    datasourceUid: "__expr__"
+                    model:
+                      type: threshold
+                      refId: C
+                      expression: B
+                      conditions:
+                        - evaluator:
+                            type: gt
+                            params: [2]
+                          operator:
+                            type: and
+                          query:
+                            params: [B]
+                          reducer:
+                            type: last
+              - uid: node-memory-pressure
+                title: NodeMemoryPressure
+                condition: C
+                noDataState: OK
+                execErrState: OK
+                for: 5m
+                labels:
+                  severity: warning
+                annotations:
+                  summary: "Memory pressure stall above 1%"
+                  description: "System is experiencing memory pressure — processes are stalling waiting for memory. Check if swap is being used heavily."
+                data:
+                  - refId: A
+                    datasourceUid: prometheus
+                    relativeTimeRange:
+                      from: 600
+                      to: 0
+                    model:
+                      expr: rate(node_pressure_memory_stalled_seconds_total[5m]) * 100
+                      instant: false
+                      range: true
+                      intervalMs: 1000
+                      maxDataPoints: 43200
+                      refId: A
+                  - refId: B
+                    datasourceUid: "__expr__"
+                    model:
+                      type: reduce
+                      refId: B
+                      expression: A
+                      reducer: last
+                      settings:
+                        mode: dropNN
+                  - refId: C
+                    datasourceUid: "__expr__"
+                    model:
+                      type: threshold
+                      refId: C
+                      expression: B
+                      conditions:
+                        - evaluator:
+                            type: gt
+                            params: [1]
+                          operator:
+                            type: and
+                          query:
+                            params: [B]
+                          reducer:
+                            type: last
