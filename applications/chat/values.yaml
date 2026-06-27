@@ -33,6 +33,22 @@ open-webui:
   extraEnvVars:
     - name: ENABLE_SIGNUP
       value: "false"
+    # Web search via DDGS metasearch engine (DuckDuckGo backend)
+    - name: ENABLE_WEB_SEARCH
+      value: "true"
+    - name: WEB_SEARCH_ENGINE
+      value: "ddgs"
+    - name: DDGS_BACKEND
+      value: "duckduckgo"
+    - name: WEB_SEARCH_RESULT_COUNT
+      value: "5"
+    # Security & privacy hardening
+    - name: WEBUI_SESSION_COOKIE_SECURE
+      value: "true"
+    - name: CORS_ALLOW_ORIGIN
+      value: "https://chat.lukaswoellhaf.com"
+    - name: ENABLE_COMMUNITY_SHARING
+      value: "false"
 
   ingress:
     enabled: true
