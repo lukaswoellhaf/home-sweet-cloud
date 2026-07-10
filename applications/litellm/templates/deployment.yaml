@@ -47,10 +47,6 @@ spec:
             - name: config
               mountPath: /etc/litellm
               readOnly: true
-            {{- if .Values.persistence.enabled }}
-            - name: data
-              mountPath: {{ .Values.persistence.mountPath }}
-            {{- end }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
@@ -63,8 +59,3 @@ spec:
         - name: config
           configMap:
             name: litellm-config
-        {{- if .Values.persistence.enabled }}
-        - name: data
-          persistentVolumeClaim:
-            claimName: litellm-data
-        {{- end }}

@@ -46,13 +46,6 @@ serviceMonitor:
   enabled: true
   interval: 60s
 
-# Persistence for SQLite database
-persistence:
-  enabled: true
-  storageClass: ""
-  size: 2Gi
-  mountPath: /app/data
-
 # Resource limits
 resources:
   limits:
