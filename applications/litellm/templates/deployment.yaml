@@ -39,6 +39,8 @@ spec:
             - secretRef:
                 name: litellm-api-keys
           env:
+            - name: PYTHONUNBUFFERED
+              value: "1"
             - name: LITELLM_MODE
               value: "PROXY"
           volumeMounts:
