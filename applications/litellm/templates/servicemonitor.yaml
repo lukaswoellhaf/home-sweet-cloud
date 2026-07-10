@@ -1,0 +1,23 @@
+{{- if .Values.serviceMonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: litellm
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: {{ .Chart.Name }}
+    managed-by: helm
+spec:
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+      component: proxy
+  endpoints:
+    - port: http
+      path: /metrics
+      interval: {{ .Values.serviceMonitor.interval }}
+      # LiteLLM requires auth on /metrics — use bearer token
+      bearerTokenSecret:
+        name: litellm-api-keys
+        key: LITELLM_MASTER_KEY
+{{- end }}

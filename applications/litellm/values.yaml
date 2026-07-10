@@ -1,0 +1,94 @@
+# LiteLLM proxy configuration
+
+# Namespace
+namespace:
+  name: litellm
+  create: true
+
+# Image
+image:
+  repository: ghcr.io/berriai/litellm
+  pullPolicy: IfNotPresent
+  tag: "v1.91.1"
+
+replicaCount: 1
+
+# API keys (injected via CI/CD secrets)
+apiKeys:
+  openaiApiKey: ""
+  mistralApiKey: ""
+  deepseekApiKey: ""
+
+# LiteLLM master key (injected via CI/CD secrets)
+litellmMasterKey: ""
+
+# Models and provers to expose through the proxy
+modelList:
+  - model_name: "openai/*"
+    litellm_params:
+      model: "openai/*"
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: "mistral/*"
+    litellm_params:
+      model: "mistral/*"
+      api_key: os.environ/MISTRAL_API_KEY
+  - model_name: "deepseek/*"
+    litellm_params:
+      model: "deepseek/*"
+      api_key: os.environ/DEEPSEEK_API_KEY
+
+service:
+  type: ClusterIP
+  port: 4000
+
+# Prometheus ServiceMonitor
+serviceMonitor:
+  enabled: true
+  interval: 60s
+
+# Persistence for SQLite database
+persistence:
+  enabled: true
+  storageClass: ""
+  size: 2Gi
+  mountPath: /app/data
+
+# Resource limits
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 256Mi
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /health/liveliness
+    port: 4000
+  initialDelaySeconds: 10
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health/readiness
+    port: 4000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65532    # wolfi-base nonroot user (image defaults to root)
+  fsGroup: 65532
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: false  # Needs to write SQLite DB
