@@ -20,7 +20,7 @@ kube-prometheus-stack:
       # Pick up all ServiceMonitors and PodMonitors regardless of labels
       serviceMonitorSelectorNilUsesHelmValues: false
       podMonitorSelectorNilUsesHelmValues: false
-      retention: 7d
+      retention: 30d
       resources:
         requests:
           cpu: 50m
@@ -34,7 +34,7 @@ kube-prometheus-stack:
             accessModes: ["ReadWriteOnce"]
             resources:
               requests:
-                storage: 10Gi
+                storage: 20Gi
 
   alertmanager:
     # Disabled - Grafana Alerting handles routing and notifications

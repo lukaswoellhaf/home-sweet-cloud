@@ -1,6 +1,7 @@
 {{- /*
-  LiteLLM AI Gateway dashboard
-  Source: https://github.com/BerriAI/litellm/tree/main/cookbook/litellm_proxy_server/grafana_dashboard/dashboard_v2
+  LiteLLM — Costs & Usage
+  Custom dashboard: spend per model, token usage, requests, latency.
+  Stateless proxy — no virtual key or team panels.
 */ -}}
 apiVersion: v1
 kind: ConfigMap
