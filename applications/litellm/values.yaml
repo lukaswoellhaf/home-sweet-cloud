@@ -50,10 +50,10 @@ serviceMonitor:
 resources:
   limits:
     cpu: 500m
-    memory: 512Mi
+    # No memory limit — startup spikes above 1Gi
   requests:
     cpu: 100m
-    memory: 256Mi
+    memory: 384Mi
 
 # Health checks
 livenessProbe:
