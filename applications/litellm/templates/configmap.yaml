@@ -16,6 +16,7 @@ data:
 
     general_settings:
       master_key: os.environ/LITELLM_MASTER_KEY
+      require_auth_for_metrics_endpoint: false
 
     router_settings:
       num_retries: 2

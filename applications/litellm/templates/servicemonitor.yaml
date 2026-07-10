@@ -16,8 +16,4 @@ spec:
     - port: http
       path: /metrics
       interval: {{ .Values.serviceMonitor.interval }}
-      # LiteLLM requires auth on /metrics — use bearer token
-      bearerTokenSecret:
-        name: litellm-api-keys
-        key: LITELLM_MASTER_KEY
 {{- end }}
