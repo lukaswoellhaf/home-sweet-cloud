@@ -41,6 +41,21 @@ service:
   type: ClusterIP
   port: 4000
 
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: llm.lukaswoellhaf.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: llm-lukaswoellhaf-com-tls
+      hosts:
+        - llm.lukaswoellhaf.com
+
 # Prometheus ServiceMonitor
 serviceMonitor:
   enabled: true
