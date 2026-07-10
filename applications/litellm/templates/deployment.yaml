@@ -43,6 +43,10 @@ spec:
               value: "1"
             - name: LITELLM_MODE
               value: "PROXY"
+            - name: NO_DOCS
+              value: "True"
+            - name: NO_REDOC
+              value: "True"
           volumeMounts:
             - name: config
               mountPath: /etc/litellm
