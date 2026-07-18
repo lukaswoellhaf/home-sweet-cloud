@@ -7,7 +7,7 @@ metadata:
     app: {{ .Chart.Name }}
     managed-by: helm
 data:
-  force_moonshot_params.py: |
+  force_moonshot_params: |
     """
     Pre-call hook that forces temperature=1.0 for all moonshot/kimi models.
     Kimi K3 and K2.6 have a fixed temperature of 1.0 — any other value errors.
