@@ -18,6 +18,7 @@ apiKeys:
   openaiApiKey: ""
   mistralApiKey: ""
   deepseekApiKey: ""
+  moonshotApiKey: ""
 
 # LiteLLM master key (injected via CI/CD secrets)
 litellmMasterKey: ""
@@ -36,6 +37,10 @@ modelList:
     litellm_params:
       model: "deepseek/*"
       api_key: os.environ/DEEPSEEK_API_KEY
+  - model_name: "moonshot/*"
+    litellm_params:
+      model: "moonshot/*"
+      api_key: os.environ/MOONSHOT_API_KEY
 
 service:
   type: ClusterIP
