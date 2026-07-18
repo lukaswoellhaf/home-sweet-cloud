@@ -12,6 +12,7 @@ data:
     {{- toYaml .Values.modelList | nindent 4 }}
 
     litellm_settings:
+      drop_params: true
       callbacks: ["prometheus"]
 
     general_settings:
