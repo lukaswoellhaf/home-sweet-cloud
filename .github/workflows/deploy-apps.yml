@@ -332,6 +332,7 @@ jobs:
             --set apiKeys.openaiApiKey=${{ secrets.OPENAI_API_KEY }} \
             --set apiKeys.mistralApiKey=${{ secrets.MISTRAL_API_KEY }} \
             --set apiKeys.deepseekApiKey=${{ secrets.DEEPSEEK_API_KEY }} \
+            --set apiKeys.moonshotApiKey=${{ secrets.MOONSHOT_API_KEY }} \
             --set litellmMasterKey=${{ secrets.LITELLM_MASTER_KEY }} \
             --wait \
             --timeout 5m
