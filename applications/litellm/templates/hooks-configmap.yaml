@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: litellm-hooks
+  namespace: {{ .Values.namespace.name }}
+  labels:
+    app: {{ .Chart.Name }}
+    managed-by: helm
+data:
+  force_moonshot_params.py: |
+    """
+    Pre-call hook that forces temperature=1.0 for all moonshot/kimi models.
+    Kimi K3 and K2.6 have a fixed temperature of 1.0 — any other value errors.
+    Required because VS Code Copilot sends its own temperature value which
+    LiteLLM cannot override via litellm_params (those are defaults, not overrides).
+    """
+    from litellm.integrations.custom_logger import CustomLogger
+
+
+    class ForceMoonshotParams(CustomLogger):
+        async def async_pre_call_hook(self, user_api_key_dict, cache, data, call_type):
+            model = str(data.get("model", ""))
+            if "moonshot" in model or model in ("kimi-k3", "kimi-k2.6"):
+                data["temperature"] = 1.0
+            return data
+
+
+    force_moonshot_params = ForceMoonshotParams()

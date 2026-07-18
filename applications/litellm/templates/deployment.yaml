@@ -51,6 +51,9 @@ spec:
             - name: config
               mountPath: /etc/litellm
               readOnly: true
+            - name: hooks
+              mountPath: /app/hooks
+              readOnly: true
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
@@ -63,3 +66,6 @@ spec:
         - name: config
           configMap:
             name: litellm-config
+        - name: hooks
+          configMap:
+            name: litellm-hooks

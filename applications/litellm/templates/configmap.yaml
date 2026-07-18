@@ -13,7 +13,7 @@ data:
 
     litellm_settings:
       drop_params: true
-      callbacks: ["prometheus"]
+      callbacks: ["prometheus", "/app/hooks/force_moonshot_params"]
 
     general_settings:
       master_key: os.environ/LITELLM_MASTER_KEY
