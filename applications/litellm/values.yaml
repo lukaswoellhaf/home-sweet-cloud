@@ -9,7 +9,7 @@ namespace:
 image:
   repository: ghcr.io/berriai/litellm-non_root
   pullPolicy: IfNotPresent
-  tag: "v1.91.1"
+  tag: "v1.93.0"
 
 replicaCount: 1
 
