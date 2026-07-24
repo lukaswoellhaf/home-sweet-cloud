@@ -1,0 +1,129 @@
+# LiteLLM proxy configuration
+
+# Namespace
+namespace:
+  name: litellm
+  create: true
+
+# Image
+image:
+  repository: ghcr.io/berriai/litellm-non_root
+  pullPolicy: IfNotPresent
+  tag: "v1.93.0"
+
+replicaCount: 1
+
+# API keys (injected via CI/CD secrets)
+apiKeys:
+  openaiApiKey: ""
+  mistralApiKey: ""
+  deepseekApiKey: ""
+  moonshotApiKey: ""
+
+# LiteLLM master key (injected via CI/CD secrets)
+litellmMasterKey: ""
+
+# Models and provers to expose through the proxy
+modelList:
+  - model_name: "openai/*"
+    litellm_params:
+      model: "openai/*"
+      api_key: os.environ/OPENAI_API_KEY
+  - model_name: "mistral/*"
+    litellm_params:
+      model: "mistral/*"
+      api_key: os.environ/MISTRAL_API_KEY
+  - model_name: "deepseek/*"
+    litellm_params:
+      model: "deepseek/*"
+      api_key: os.environ/DEEPSEEK_API_KEY
+  - model_name: "kimi-k3"
+    litellm_params:
+      model: "moonshot/kimi-k3"
+      api_key: os.environ/MOONSHOT_API_KEY
+      temperature: 1.0
+      top_p: 0.95
+    model_info:
+      mode: "chat"
+      max_tokens: 131072
+      max_input_tokens: 1000000
+      supports_function_calling: true
+      supports_vision: true
+  - model_name: "kimi-k2.6"
+    litellm_params:
+      model: "moonshot/kimi-k2.6"
+      api_key: os.environ/MOONSHOT_API_KEY
+      temperature: 1.0
+      top_p: 0.95
+    model_info:
+      mode: "chat"
+      max_tokens: 32768
+      max_input_tokens: 256000
+      supports_function_calling: true
+      supports_vision: true
+
+service:
+  type: ClusterIP
+  port: 4000
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: llm.lukaswoellhaf.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: llm-lukaswoellhaf-com-tls
+      hosts:
+        - llm.lukaswoellhaf.com
+
+# Prometheus ServiceMonitor
+serviceMonitor:
+  enabled: true
+  interval: 60s
+
+# Resource limits
+resources:
+  limits:
+    cpu: 500m
+    # No memory limit — startup spikes above 1Gi
+  requests:
+    cpu: 100m
+    memory: 384Mi
+
+# Health checks
+livenessProbe:
+  httpGet:
+    path: /health/liveliness
+    port: 4000
+  initialDelaySeconds: 30
+  periodSeconds: 20
+  timeoutSeconds: 5
+  failureThreshold: 3
+
+readinessProbe:
+  httpGet:
+    path: /health/readiness
+    port: 4000
+  initialDelaySeconds: 15
+  periodSeconds: 10
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 65534    # litellm-non_root image uses 65534
+  fsGroup: 65534
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true

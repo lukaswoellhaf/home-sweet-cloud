@@ -25,6 +25,8 @@ ingress:
     service: http://localhost:80
   - hostname: www.chat.lukaswoellhaf.com
     service: http://localhost:80
+  - hostname: llm.lukaswoellhaf.com
+    service: http://localhost:80
   
   # Catch-all: no other routes match
   - service: http_status:404

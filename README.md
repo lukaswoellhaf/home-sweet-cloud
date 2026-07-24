@@ -13,6 +13,7 @@ Infrastructure as Code repository for creating and managing a personal Kubernete
 - **Prometheus** - Metrics collection
 - **Grafana** - Metrics visualization and alerting
 - **Loki & Promtail** - Log aggregation
+- **LiteLLM** - Unified LLM API proxy with cost tracking
 
 ## Project Structure
 
@@ -23,6 +24,7 @@ applications/       Application deployments
   bytestash/        Code snippet manager
   portfolio-website/ Personal website
   chat/             Open WebUI
+  litellm/          LLM API proxy
 ```
 
 ## Infrastructure
@@ -44,6 +46,8 @@ The infrastructure chart provides:
 
 [**Chat**](https://github.com/lukaswoellhaf/home-sweet-cloud) — Open WebUI — accessible at [chat.lukaswoellhaf.com](https://chat.lukaswoellhaf.com)
 
+[**LiteLLM**](https://github.com/BerriAI/litellm) — Unified LLM API proxy that exposes provider like OpenAI, Mistral, DeepSeek, and Kimi models through a single OpenAI-compatible endpoint at [llm.lukaswoellhaf.com](https://llm.lukaswoellhaf.com). Enables support for both Open WebUI and VS Code Copilot BYO-model. See [`docs/litellm-setup.md`](docs/litellm-setup.md) for details.
+
 ## DNS
 
 **Registrar:** Netcup &nbsp;|&nbsp; **DNS management:** Cloudflare &nbsp;|&nbsp; **Public exposure:** Cloudflare Tunnel
@@ -54,6 +58,7 @@ The infrastructure chart provides:
 | `code.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
 | `grafana.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
 | `chat.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
+| `llm.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
 | `www.lukaswoellhaf.com` | CNAME | `lukaswoellhaf.com` |
 | `www.code.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
 | `www.grafana.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |

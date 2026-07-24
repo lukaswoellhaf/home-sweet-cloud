@@ -1,0 +1,15 @@
+{{- /*
+  LiteLLM — Costs & Usage
+  Custom dashboard: spend per model, token usage, requests, latency.
+  Stateless proxy — no virtual key or team panels.
+*/ -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: litellm-dashboard
+  namespace: {{ .Release.Namespace }}
+  labels:
+    grafana_dashboard: "1"
+data:
+  litellm.json: |
+{{ .Files.Get "dashboards/litellm.json" | indent 4 }}
