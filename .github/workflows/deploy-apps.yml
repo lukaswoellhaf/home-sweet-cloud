@@ -275,6 +275,7 @@ jobs:
             --create-namespace \
             --set apiKeys.openaiApiKey=${{ secrets.OPENAI_API_KEY }} \
             --set apiKeys.mistralApiKey=${{ secrets.MISTRAL_API_KEY }} \
+            --set apiKeys.braveSearchApiKey=${{ secrets.BRAVE_SEARCH_API_KEY }} \
             --wait \
             --timeout 5m
           echo "Chat deployed successfully" >> $GITHUB_STEP_SUMMARY

@@ -6,6 +6,7 @@ apiKeys:
   # Will be overridden in workflow with actual secrets
   openaiApiKey: ""
   mistralApiKey: ""
+  braveSearchApiKey: ""
 
 open-webui:
   namespaceOverride: chat
@@ -32,6 +33,38 @@ open-webui:
   # Disable signup
   extraEnvVars:
     - name: ENABLE_SIGNUP
+      value: "false"
+    # Web search via Brave Search API (brave_llm_context)
+    - name: ENABLE_WEB_SEARCH
+      value: "true"
+    - name: WEB_SEARCH_ENGINE
+      value: "brave_llm_context"
+    - name: BRAVE_SEARCH_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: web-search-api-keys
+          key: brave-search-api-key
+    - name: WEB_SEARCH_CONCURRENT_REQUESTS
+      value: "1"
+    - name: WEB_SEARCH_RESULT_COUNT
+      value: "3"
+    # Use OpenAI for embeddings (fast API vs slow local CPU)
+    - name: RAG_EMBEDDING_ENGINE
+      value: "openai"
+    - name: RAG_EMBEDDING_MODEL
+      value: "text-embedding-3-small"
+    # v0.9.6 web search retrieval fix (github.com/open-webui/open-webui/issues/25585)
+    - name: ENABLE_RETRIEVAL_UNSCOPED_COLLECTIONS
+      value: "true"
+    # Native function calling (required for web search in v0.9.6+)
+    - name: DEFAULT_MODEL_PARAMS
+      value: '{"function_calling":"native"}'
+    # Security & privacy hardening
+    - name: WEBUI_SESSION_COOKIE_SECURE
+      value: "true"
+    - name: CORS_ALLOW_ORIGIN
+      value: "https://chat.lukaswoellhaf.com"
+    - name: ENABLE_COMMUNITY_SHARING
       value: "false"
 
   ingress:
