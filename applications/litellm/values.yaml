@@ -126,4 +126,4 @@ securityContext:
   capabilities:
     drop:
       - ALL
-  readOnlyRootFilesystem: false  # Needs to write SQLite DB
+  readOnlyRootFilesystem: true

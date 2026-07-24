@@ -56,6 +56,9 @@ spec:
             - name: hooks
               mountPath: /app/hooks
               readOnly: true
+            - name: tmp
+              mountPath: /tmp
+              readOnly: false
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:
@@ -71,3 +74,5 @@ spec:
         - name: hooks
           configMap:
             name: litellm-hooks
+        - name: tmp
+          emptyDir: {}
