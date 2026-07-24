@@ -118,6 +118,8 @@ podSecurityContext:
   runAsNonRoot: true
   runAsUser: 65534    # litellm-non_root image uses 65534
   fsGroup: 65534
+  seccompProfile:
+    type: RuntimeDefault
 
 securityContext:
   allowPrivilegeEscalation: false
