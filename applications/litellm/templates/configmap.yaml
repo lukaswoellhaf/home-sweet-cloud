@@ -16,9 +16,6 @@ data:
       route_all_chat_openai_to_responses: true
       callbacks: ["prometheus", "/app/hooks/force_moonshot_params.force_moonshot_params"]
 
-    general_settings:
-      master_key: os.environ/LITELLM_MASTER_KEY
-
     router_settings:
       num_retries: 2
       allowed_fails: 3
