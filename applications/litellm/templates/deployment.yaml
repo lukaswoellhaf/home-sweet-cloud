@@ -47,6 +47,8 @@ spec:
               value: "True"
             - name: NO_REDOC
               value: "True"
+            - name: DISABLE_ADMIN_UI
+              value: "True"
           volumeMounts:
             - name: config
               mountPath: /etc/litellm
