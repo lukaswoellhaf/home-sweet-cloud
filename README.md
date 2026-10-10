@@ -43,7 +43,7 @@ The infrastructure chart provides:
 
 [**Portfolio Website**](https://github.com/lukaswoellhaf/lukaswoellhafcom) - Personal portfolio website. Accesible at [lukaswoellhaf.com](https://lukaswoellhaf.com)
 
-[**Chat**](https://github.com/open-webui/open-webui) — Open WebUI, accessible at [chat.lukaswoellhaf.com](https://chat.lukaswoellhaf.com), uses [Eden AI](https://www.edenai.co/) as its single managed gateway for chat models, RAG embeddings, and billing. VS Code uses the same gateway alongside built-in Copilot; Brave Search remains the web search provider. See [Eden AI setup](docs/eden-ai-setup.md) for model selection, budgets, and cutover instructions.
+[**Chat**](https://github.com/open-webui/open-webui) — Open WebUI, accessible at [chat.lukaswoellhaf.com](https://chat.lukaswoellhaf.com), uses [Eden AI](https://www.edenai.co/) as its single managed gateway for chat models, RAG embeddings, and billing. VS Code uses the same gateway alongside built-in Copilot; Brave Search remains the web search provider. See [Eden AI setup](docs/eden-ai-setup.md) for configuration and budgets.
 
 ## DNS
 
