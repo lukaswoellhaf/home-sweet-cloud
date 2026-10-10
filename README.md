@@ -75,7 +75,7 @@ Grafana's native alerting sends `warning` and `critical` alerts to Discord via a
 
 ## Cluster Provisioning
 
-All cluster configurations and deployments are automated via GitHub Actions pipelines:
+All cluster configurations and deployments are automated via GitHub Actions. Configure [Tailscale CI access](docs/tailscale-ci-setup.md) first:
 
 0. **Set up the server** — Follow [server-setup.md`](docs/server-setup.md) to configure the ThinkPad as a headless Ubuntu home server (BIOS, SSH hardening, firewall, lid-close behavior).
 1. **Install k3s**: Run `install-k3s` workflow to bootstrap the cluster using k3sup
@@ -83,7 +83,7 @@ All cluster configurations and deployments are automated via GitHub Actions pipe
 3. **Deploy Infrastructure**: Run `deploy-base-infra` workflow to install cert-manager and base infrastructure
 4. **Deploy Applications**: Run `deploy-apps` workflow to deploy individual applications
 
-Required GitHub secrets: `SSH_PRIVATE_KEY`, `PAT_SECRET_MANAGER` (for automatic secret management), `GRAFANA_ADMIN_USERNAME`, `GRAFANA_ADMIN_PASSWORD`, `DISCORD_WEBHOOK_URL`, and application-specific secrets, including `EDEN_AI_API_KEY` and `BRAVE_SEARCH_API_KEY` for Chat.
+Required GitHub secrets: `TS_OAUTH_CLIENT_ID`, `TS_OAUTH_SECRET`, `SSH_PRIVATE_KEY`, `PAT_SECRET_MANAGER` (for automatic secret management), `GRAFANA_ADMIN_USERNAME`, `GRAFANA_ADMIN_PASSWORD`, `DISCORD_WEBHOOK_URL`, and application-specific secrets, including `EDEN_AI_API_KEY` and `BRAVE_SEARCH_API_KEY` for Chat.
 
 ## Local Development
 

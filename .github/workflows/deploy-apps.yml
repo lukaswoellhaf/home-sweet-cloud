@@ -33,7 +33,6 @@ jobs:
         with:
           repository: lukaswoellhaf/lukaswoellhafcom
           path: lukaswoellhafcom
-          token: ${{ secrets.CHECKOUT_TOKEN }}
       
       - name: Set up kubectl
         uses: azure/setup-kubectl@v5
@@ -58,8 +57,11 @@ jobs:
       - name: Connect to Tailscale
         uses: tailscale/github-action@v4
         with:
-          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
           version: latest
+          ping: ${{ vars.SERVER_IP }}
       
       - name: Configure kubectl with service account
         run: |
@@ -120,8 +122,11 @@ jobs:
       - name: Connect to Tailscale
         uses: tailscale/github-action@v4
         with:
-          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
           version: latest
+          ping: ${{ vars.SERVER_IP }}
       
       - name: Configure kubectl with service account
         run: |
@@ -180,8 +185,11 @@ jobs:
       - name: Connect to Tailscale
         uses: tailscale/github-action@v4
         with:
-          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
           version: latest
+          ping: ${{ vars.SERVER_IP }}
       
       - name: Configure kubectl with service account
         run: |
@@ -241,8 +249,11 @@ jobs:
       - name: Connect to Tailscale
         uses: tailscale/github-action@v4
         with:
-          authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
+          oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
+          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
           version: latest
+          ping: ${{ vars.SERVER_IP }}
       
       - name: Configure kubectl with service account
         run: |
