@@ -13,7 +13,7 @@ Infrastructure as Code repository for creating and managing a personal Kubernete
 - **Prometheus** - Metrics collection
 - **Grafana** - Metrics visualization and alerting
 - **Loki & Promtail** - Log aggregation
-- **LiteLLM** - Unified LLM API proxy with cost tracking
+- **Eden AI** - Managed model gateway for chat, embeddings, and unified billing
 
 ## Project Structure
 
@@ -23,8 +23,7 @@ applications/       Application deployments
   monitoring/       Prometheus, Grafana, Loki
   bytestash/        Code snippet manager
   portfolio-website/ Personal website
-  chat/             Open WebUI
-  litellm/          LLM API proxy
+  chat/             Open WebUI (Eden AI gateway)
 ```
 
 ## Infrastructure
@@ -44,9 +43,7 @@ The infrastructure chart provides:
 
 [**Portfolio Website**](https://github.com/lukaswoellhaf/lukaswoellhafcom) - Personal portfolio website. Accesible at [lukaswoellhaf.com](https://lukaswoellhaf.com)
 
-[**Chat**](https://github.com/lukaswoellhaf/home-sweet-cloud) — Open WebUI — accessible at [chat.lukaswoellhaf.com](https://chat.lukaswoellhaf.com)
-
-[**LiteLLM**](https://github.com/BerriAI/litellm) — Unified LLM API proxy that exposes provider like OpenAI, Mistral, DeepSeek, and Kimi models through a single OpenAI-compatible endpoint at [llm.lukaswoellhaf.com](https://llm.lukaswoellhaf.com). Enables support for both Open WebUI and VS Code Copilot BYO-model. See [`docs/litellm-setup.md`](docs/litellm-setup.md) for details.
+[**Chat**](https://github.com/open-webui/open-webui) — Open WebUI, accessible at [chat.lukaswoellhaf.com](https://chat.lukaswoellhaf.com), uses [Eden AI](https://www.edenai.co/) as its single managed gateway for chat models, RAG embeddings, and billing. VS Code uses the same gateway alongside built-in Copilot; Brave Search remains the web search provider. See [Eden AI setup](docs/eden-ai-setup.md) for configuration and budgets.
 
 ## DNS
 
@@ -58,7 +55,6 @@ The infrastructure chart provides:
 | `code.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
 | `grafana.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
 | `chat.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
-| `llm.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
 | `www.lukaswoellhaf.com` | CNAME | `lukaswoellhaf.com` |
 | `www.code.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
 | `www.grafana.lukaswoellhaf.com` | CNAME | `d1fd43b6-….cfargotunnel.com` (Tunnel) |
@@ -79,7 +75,7 @@ Grafana's native alerting sends `warning` and `critical` alerts to Discord via a
 
 ## Cluster Provisioning
 
-All cluster configurations and deployments are automated via GitHub Actions pipelines:
+All cluster configurations and deployments are automated via GitHub Actions. Configure [Tailscale CI access](docs/tailscale-ci-setup.md) first:
 
 0. **Set up the server** — Follow [server-setup.md`](docs/server-setup.md) to configure the ThinkPad as a headless Ubuntu home server (BIOS, SSH hardening, firewall, lid-close behavior).
 1. **Install k3s**: Run `install-k3s` workflow to bootstrap the cluster using k3sup
@@ -87,7 +83,7 @@ All cluster configurations and deployments are automated via GitHub Actions pipe
 3. **Deploy Infrastructure**: Run `deploy-base-infra` workflow to install cert-manager and base infrastructure
 4. **Deploy Applications**: Run `deploy-apps` workflow to deploy individual applications
 
-Required GitHub secrets: `SSH_PRIVATE_KEY`, `PAT_SECRET_MANAGER` (for automatic secret management), `GRAFANA_ADMIN_USERNAME`, `GRAFANA_ADMIN_PASSWORD`, `DISCORD_WEBHOOK_URL`, and application-specific secrets.
+Required GitHub secrets: `TS_OAUTH_CLIENT_ID`, `TS_OAUTH_SECRET`, `SSH_PRIVATE_KEY`, `PAT_SECRET_MANAGER` (for automatic secret management), `GRAFANA_ADMIN_USERNAME`, `GRAFANA_ADMIN_PASSWORD`, `DISCORD_WEBHOOK_URL`, and application-specific secrets, including `EDEN_AI_API_KEY` and `BRAVE_SEARCH_API_KEY` for Chat.
 
 ## Local Development
 

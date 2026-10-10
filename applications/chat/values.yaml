@@ -4,8 +4,7 @@ namespace:
 
 apiKeys:
   # Will be overridden in workflow with actual secrets
-  openaiApiKey: ""
-  mistralApiKey: ""
+  edenApiKey: ""
   braveSearchApiKey: ""
 
 open-webui:
@@ -18,11 +17,10 @@ open-webui:
     enabled: false
   ollamaUrls: []
 
-  # OpenAI as primary, Mistral as secondary — keys injected from combined K8s secret
+  # Eden AI is the single OpenAI-compatible model gateway
   enableOpenaiApi: true
   openaiBaseApiUrls:
-    - "https://api.openai.com/v1"
-    - "https://api.mistral.ai/v1"
+    - "https://api.edenai.run/v3"
   openaiApiKeysExistingSecret: "provider-api-keys"
   openaiApiKeysExistingSecretKey: "keys"
 
@@ -48,11 +46,18 @@ open-webui:
       value: "1"
     - name: WEB_SEARCH_RESULT_COUNT
       value: "3"
-    # Use OpenAI for embeddings (fast API vs slow local CPU)
+    # Same OpenAI embedding model via Eden; existing vectors remain compatible
     - name: RAG_EMBEDDING_ENGINE
       value: "openai"
     - name: RAG_EMBEDDING_MODEL
-      value: "text-embedding-3-small"
+      value: "openai/text-embedding-3-small"
+    - name: RAG_OPENAI_API_BASE_URL
+      value: "https://api.edenai.run/v3"
+    - name: RAG_OPENAI_API_KEY
+      valueFrom:
+        secretKeyRef:
+          name: provider-api-keys
+          key: keys
     # v0.9.6 web search retrieval fix (github.com/open-webui/open-webui/issues/25585)
     - name: ENABLE_RETRIEVAL_UNSCOPED_COLLECTIONS
       value: "true"
